@@ -1,18 +1,17 @@
-<!-- Trading Dashboard Panel + Live Chart XAUUSD -->
+<!-- FINAL Trading Dashboard Panel + Live Chart XAUUSD -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Trading Dashboard Panel</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
       padding: 0;
-      background: #f9f9f9;
-      color: #333;
+      background: #f2f4f8;
     }
     header {
       background: #0077cc;
@@ -21,11 +20,23 @@
       text-align: center;
     }
     .container {
-      max-width: 800px;
-      margin: auto;
+      max-width: 900px;
+      margin: 20px auto;
       padding: 20px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    }
+    .section {
+      margin-bottom: 30px;
+    }
+    h3 {
+      border-left: 5px solid #0077cc;
+      padding-left: 10px;
+      margin-bottom: 15px;
     }
     label {
+      font-weight: bold;
       display: block;
       margin-top: 10px;
     }
@@ -33,42 +44,55 @@
       width: 100%;
       padding: 10px;
       margin-top: 5px;
+      margin-bottom: 10px;
       border-radius: 5px;
       border: 1px solid #ccc;
+      font-size: 14px;
     }
     button {
       background: #0077cc;
-      color: #fff;
+      color: white;
       border: none;
       cursor: pointer;
+      transition: background 0.3s;
     }
     button:hover {
       background: #005fa3;
     }
     table {
       width: 100%;
-      margin-top: 20px;
       border-collapse: collapse;
     }
     th, td {
+      padding: 10px;
       border: 1px solid #ddd;
-      padding: 8px;
       text-align: center;
+      font-size: 14px;
     }
     th {
-      background: #0077cc;
+      background-color: #0077cc;
       color: white;
     }
-    .section {
-      background: white;
-      padding: 15px;
-      margin-bottom: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    iframe {
+      border: none;
+      width: 100%;
+      height: 400px;
+    }
+    .log-box {
+      background: #f8f9fb;
+      padding: 10px;
+      border-radius: 5px;
+      max-height: 200px;
+      overflow-y: auto;
+      font-size: 13px;
+      border: 1px solid #ddd;
     }
     @media (max-width: 600px) {
-      input, select, button {
-        font-size: 14px;
+      input, select, button, th, td {
+        font-size: 12px;
+      }
+      h3 {
+        font-size: 16px;
       }
     }
   </style>
@@ -80,10 +104,91 @@
   <div class="container">
     <div class="section">
       <h3>Live Chart XAUUSD</h3>
-      <iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_1d458&symbol=OANDA%3AXAUUSD&interval=5&hidesidetoolbar=1&symboledit=1&saveimage=1&toolbarbg=f1f3f6&studies=[]&theme=Light&style=1&timezone=Asia%2FJakarta&studies_overrides={}&overrides={}&enabled_features=[]&disabled_features=[]&locale=en" width="100%" height="400" frameborder="0" allowtransparency="true" scrolling="no"></iframe>
+      <iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_1d458&symbol=OANDA%3AXAUUSD&interval=5&hidesidetoolbar=1&symboledit=1&saveimage=1&toolbarbg=f1f3f6&studies=[]&theme=Light&style=1&timezone=Asia%2FJakarta&studies_overrides={}&overrides={}&enabled_features=[]&disabled_features=[]&locale=en"></iframe>
     </div>
-    <!-- SISA DASHBOARD PANEL TIDAK DIUBAH -->
-    <!-- ... (Copy section HTML sebelumnya secara penuh ke sini, tidak dipotong) ... -->
+
+    <div class="section">
+      <h3>Input Trading</h3>
+      <form id="tradeForm">
+        <label>Saldo Awal (USDC)</label>
+        <input type="number" id="startBalance" step="0.01" placeholder="1250.00" required />
+
+        <label>Pair Option</label>
+        <select id="pair">
+          <option>XAUUSDc</option>
+          <option>BTCUSDc</option>
+        </select>
+
+        <label>Layer</label>
+        <input type="number" id="layer" min="1" value="1" required />
+
+        <label>Lot</label>
+        <input type="number" id="lot" step="0.01" value="0.01" required />
+
+        <label>Posisi Option</label>
+        <select id="position">
+          <option>BUY</option>
+          <option>SELL</option>
+        </select>
+
+        <label>Alasan Entry</label>
+        <input type="text" id="reason" placeholder="Misalnya: Breakout, MA50 support" required />
+
+        <label>Harga Entry</label>
+        <input type="number" id="entryPrice" step="0.0001" required />
+
+        <button type="submit">Tambahkan Entry</button>
+      </form>
+    </div>
+
+    <div class="section">
+      <h3>Posisi Terbuka</h3>
+      <table id="openTrades">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Pair</th>
+            <th>Layer</th>
+            <th>Lot</th>
+            <th>Posisi</th>
+            <th>Entry</th>
+            <th>Waktu</th>
+            <th>Alasan</th>
+            <th>Close</th>
+            <th>Delete</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <h3>History Trade</h3>
+      <table id="history">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Pair</th>
+            <th>Layer</th>
+            <th>Lot</th>
+            <th>Posisi</th>
+            <th>Entry</th>
+            <th>Close</th>
+            <th>Waktu Entry</th>
+            <th>Waktu Close</th>
+            <th>Pips</th>
+            <th>Profit/Loss</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <h3>Log Aktivitas</h3>
+      <div class="log-box" id="logBox"></div>
+    </div>
   </div>
+  <script src="script.js"></script>
 </body>
 </html>

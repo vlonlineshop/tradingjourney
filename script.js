@@ -1,122 +1,129 @@
-// script.js
-let trades = JSON.parse(localStorage.getItem("trades")) || [];
-let startBalance = parseFloat(localStorage.getItem("startBalance")) || 1250.00;
+let trades = JSON.parse(localStorage.getItem('trades')) || [];
+let balance = 1250.00;
 
-const form = document.getElementById("tradeForm");
-const openTradesTable = document.getElementById("openTrades").querySelector("tbody");
-const historyTable = document.getElementById("history").querySelector("tbody");
-const logBox = document.getElementById("logBox");
-const startBalanceInput = document.getElementById("startBalance");
-
-startBalanceInput.value = startBalance.toFixed(2);
+const form = document.getElementById('tradeForm');
+const openTradesTable = document.querySelector('#openTrades tbody');
+const historyTable = document.querySelector('#history tbody');
+const logBox = document.getElementById('logBox');
 
 function saveTrades() {
-  localStorage.setItem("trades", JSON.stringify(trades));
-  localStorage.setItem("startBalance", startBalance.toFixed(2));
+  localStorage.setItem('trades', JSON.stringify(trades));
 }
 
-function renderTrades() {
-  openTradesTable.innerHTML = "";
-  historyTable.innerHTML = "";
-  let index = 1;
-  let wins = 0, losses = 0;
-  let totalProfit = 0;
+function updateRekap() {
+  const totalTrade = trades.filter(t => t.closePrice).length;
+  const winTrade = trades.filter(t => t.profitUsdc > 0).length;
+  const lossTrade = trades.filter(t => t.profitUsdc < 0).length;
+  const totalPips = trades.reduce((sum, t) => sum + (t.pips || 0), 0);
+  const totalUsdc = trades.reduce((sum, t) => sum + (t.profitUsdc || 0), 0);
+  const winrate = totalTrade > 0 ? ((winTrade / totalTrade) * 100).toFixed(2) : 0;
 
-  trades.forEach((t, i) => {
-    if (!t.closePrice) {
-      const row = openTradesTable.insertRow();
-      row.innerHTML = `
-        <td>${index}</td>
-        <td>${t.pair}</td>
-        <td>${t.layer}</td>
-        <td>${t.lot}</td>
-        <td>${t.position}</td>
-        <td>${t.entryPrice.toFixed(2)}</td>
-        <td>${t.openTime}</td>
-        <td>${t.reason}</td>
-        <td><button onclick="closeTrade(${i})">Close</button></td>
-        <td><button onclick="deleteTrade(${i})">Hapus</button></td>
-      `;
-    } else {
-      const row = historyTable.insertRow();
-      const profitUSDC = (t.pips * t.lot * t.layer).toFixed(2);
-      totalProfit += parseFloat(profitUSDC);
-      const isProfit = (t.position === "BUY" && t.pips > 0) || (t.position === "SELL" && t.pips < 0);
-      if (isProfit) wins++; else losses++;
+  document.getElementById('totalTrade').innerText = totalTrade;
+  document.getElementById('winTrade').innerText = winTrade;
+  document.getElementById('lossTrade').innerText = lossTrade;
+  document.getElementById('totalPips').innerText = totalPips.toFixed(2);
+  document.getElementById('totalUsdc').innerText = totalUsdc.toFixed(2);
+  document.getElementById('winrate').innerText = `${winrate}%`;
+}
 
-      row.innerHTML = `
-        <td>${index}</td>
-        <td>${t.pair}</td>
-        <td>${t.layer}</td>
-        <td>${t.lot}</td>
-        <td>${t.position}</td>
-        <td>${t.entryPrice.toFixed(2)}</td>
-        <td>${t.closePrice.toFixed(2)}</td>
-        <td>${t.openTime}</td>
-        <td>${t.closeTime}</td>
-        <td>${t.pips}</td>
-        <td>${profitUSDC} USDC</td>
-      `;
-    }
-    index++;
+function renderOpenTrades() {
+  openTradesTable.innerHTML = '';
+  trades.filter(t => !t.closePrice).forEach((trade, index) => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${index + 1}</td>
+      <td>${trade.pair}</td>
+      <td>${trade.layer}</td>
+      <td>${trade.lot}</td>
+      <td>${trade.position}</td>
+      <td>${trade.entryPrice.toFixed(2)}</td>
+      <td>${trade.time}</td>
+      <td>${trade.reason}</td>
+      <td><input type="number" step="0.01" placeholder="Close price" onblur="closeTrade(${index}, this.value)"></td>
+      <td><button onclick="deleteTrade(${index})">🗑️</button></td>
+    `;
+    openTradesTable.appendChild(row);
   });
-
-  const total = wins + losses;
-  const winrate = total ? ((wins / total) * 100).toFixed(2) : 0;
-  logBox.innerHTML = `<strong>Saldo Akhir: ${startBalance.toFixed(2)} USDC</strong><br>Winrate: <strong>${winrate}%</strong> (${wins} win / ${losses} loss)`;
 }
 
-function calcPips(entry, close, position) {
-  const pips = Math.round((close - entry) * 100); // 2 digit desimal
-  if (position === "SELL") {
-    return -pips;
-  }
-  return pips;
+function renderHistory() {
+  historyTable.innerHTML = '';
+  trades.filter(t => t.closePrice).forEach((trade, index) => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${index + 1}</td>
+      <td>${trade.pair}</td>
+      <td>${trade.layer}</td>
+      <td>${trade.lot}</td>
+      <td>${trade.position}</td>
+      <td>${trade.entryPrice.toFixed(2)}</td>
+      <td>${trade.closePrice.toFixed(2)}</td>
+      <td>${trade.time}</td>
+      <td>${trade.closeTime}</td>
+      <td>${trade.pips.toFixed(2)}</td>
+      <td>${trade.profitUsdc.toFixed(2)}</td>
+    `;
+    historyTable.appendChild(row);
+  });
 }
 
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const data = {
-    pair: form.pair.value,
-    layer: parseInt(form.layer.value),
-    lot: parseFloat(form.lot.value),
-    position: form.position.value,
-    reason: form.reason.value,
-    entryPrice: parseFloat(form.entryPrice.value),
-    openTime: new Date().toLocaleString(),
-    closePrice: null,
-    closeTime: null,
-    pips: null
-  };
-  trades.push(data);
-  saveTrades();
-  renderTrades();
-  form.reset();
-  startBalance = parseFloat(startBalanceInput.value);
-});
-
-function closeTrade(index) {
-  const price = prompt("Masukkan harga close:");
-  if (!price) return;
-  const closePrice = parseFloat(price);
+function closeTrade(index, closeValue) {
   const trade = trades[index];
-  const pips = calcPips(trade.entryPrice, closePrice, trade.position);
-  const profit = pips * trade.lot * trade.layer;
-  startBalance += profit;
+  const closePrice = parseFloat(closeValue);
+  if (!closePrice) return;
+
+  let pips = 0;
+  const multiplier = 100;
+  const pipValue = 1; // 1 pip = 1 point (cent)
+
+  if (trade.position === 'BUY') {
+    pips = (closePrice - trade.entryPrice) * multiplier;
+  } else {
+    pips = (trade.entryPrice - closePrice) * multiplier;
+  }
+
+  const totalUsdc = pips * trade.lot * trade.layer;
   trade.closePrice = closePrice;
-  trade.closeTime = new Date().toLocaleString();
   trade.pips = pips;
+  trade.profitUsdc = totalUsdc;
+  trade.closeTime = new Date().toLocaleString();
+  balance += totalUsdc;
+
+  logBox.innerHTML = `Trade closed: ${pips.toFixed(2)} pips | ${totalUsdc.toFixed(2)} USDC`;
+
   saveTrades();
-  renderTrades();
-  startBalanceInput.value = startBalance.toFixed(2);
+  renderOpenTrades();
+  renderHistory();
+  updateRekap();
 }
 
 function deleteTrade(index) {
-  if (confirm("Yakin ingin menghapus entry ini?")) {
-    trades.splice(index, 1);
-    saveTrades();
-    renderTrades();
-  }
+  trades.splice(index, 1);
+  saveTrades();
+  renderOpenTrades();
+  renderHistory();
+  updateRekap();
 }
 
-renderTrades();
+form.addEventListener('submit', function (e) {
+  e.preventDefault();
+  const formData = new FormData(form);
+  const trade = {
+    pair: formData.get('pair'),
+    layer: parseInt(formData.get('layer')),
+    lot: parseFloat(formData.get('lot')),
+    position: formData.get('position'),
+    reason: formData.get('reason'),
+    entryPrice: parseFloat(formData.get('entryPrice')),
+    time: new Date().toLocaleString(),
+  };
+  trades.push(trade);
+  form.reset();
+  saveTrades();
+  renderOpenTrades();
+});
+
+// Initial load
+renderOpenTrades();
+renderHistory();
+updateRekap();

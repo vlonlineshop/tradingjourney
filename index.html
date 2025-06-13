@@ -3,63 +3,118 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Trading Panel Dashboard</title>
+  <title>Trading Dashboard</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
-    <h1>📊 Trading Panel Dashboard</h1>
-    <div class="balance">💰 Saldo Awal: <span id="startBalance">1250.00</span> USDc</div>
+    <h1>📈 Trading Panel</h1>
 
-    <form id="tradeForm">
-      <div class="form-group">
-        <select name="pair" required>
-          <option value="XAUUSDc">XAUUSDc</option>
-          <option value="BTCUSDc">BTCUSDc</option>
-        </select>
-        <input type="number" name="layer" placeholder="Layer" required min="1" />
-        <input type="number" step="0.01" name="lot" placeholder="Lot" required />
-        <select name="position" required>
-          <option value="BUY">BUY</option>
-          <option value="SELL">SELL</option>
-        </select>
-        <input type="number" step="0.01" name="entryPrice" placeholder="Price Entry" required />
-        <button type="submit">Tambah Entry</button>
+    <div class="stats">
+      <div class="stat-box">
+        <h3>Saldo Awal</h3>
+        <span id="initialBalance">1250.00 USDc</span>
       </div>
-    </form>
-
-    <h2>📂 Posisi Terbuka</h2>
-    <table id="openTrades">
-      <thead>
-        <tr>
-          <th>No</th><th>Pair</th><th>Layer</th><th>Lot</th><th>Posisi</th><th>Entry</th><th>Waktu</th><th>Close</th><th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-
-    <h2>📜 Riwayat Trading</h2>
-    <table id="history">
-      <thead>
-        <tr>
-          <th>No</th><th>Pair</th><th>Layer</th><th>Lot</th><th>Posisi</th><th>Entry</th><th>Close</th><th>Open</th><th>Close</th><th>Pips</th><th>USDC</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-
-    <div class="rekap">
-      <h2>📈 Rekap Trading</h2>
-      <p>📌 Total Pips: <span id="totalPips">0</span></p>
-      <p>💵 Total USDc: <span id="totalUsdc">0</span></p>
-      <p>📊 Total Trade: <span id="totalTrade">0</span></p>
-      <p>✅ Win Trade: <span id="winTrade">0</span></p>
-      <p>❌ Loss Trade: <span id="lossTrade">0</span></p>
-      <p>🏆 Winrate: <span id="winrate">0%</span></p>
+      <div class="stat-box">
+        <h3>Saldo Akhir</h3>
+        <span id="finalBalance">1250.00 USDc</span>
+      </div>
+      <div class="stat-box">
+        <h3>Total Pips</h3>
+        <span id="totalPips">0</span>
+      </div>
+      <div class="stat-box">
+        <h3>Total USDc</h3>
+        <span id="totalUSDC">0</span>
+      </div>
+      <div class="stat-box">
+        <h3>Total Trade</h3>
+        <span id="totalTrades">0</span>
+      </div>
+      <div class="stat-box">
+        <h3>Win Trade ✅</h3>
+        <span id="winTrades">0</span>
+      </div>
+      <div class="stat-box">
+        <h3>Loss Trade ❌</h3>
+        <span id="lossTrades">0</span>
+      </div>
+      <div class="stat-box">
+        <h3>Winrate 🏆</h3>
+        <span id="winrate">0%</span>
+      </div>
     </div>
 
-    <h2>📉 Live Chart XAUUSD</h2>
-    <iframe src="https://www.tradingview.com/widgetembed/?frameElementId=tradingview_c52c1&symbol=OANDA:XAUUSD&interval=1&theme=light" width="100%" height="350" frameborder="0"></iframe>
+    <form id="tradeForm">
+      <select id="pair">
+        <option value="XAUUSDc">XAUUSDc</option>
+        <option value="BTCUSDc">BTCUSDc</option>
+      </select>
+      <input type="number" step="0.01" id="lot" placeholder="Lot (e.g. 0.01)" required />
+      <select id="position">
+        <option value="BUY">BUY</option>
+        <option value="SELL">SELL</option>
+      </select>
+      <input type="number" step="0.01" id="entryPrice" placeholder="Harga Entry (xxxx.xx)" required />
+      <button type="submit">Tambah Posisi</button>
+    </form>
+
+    <div class="table-wrapper">
+      <h2>📌 Posisi Terbuka</h2>
+      <table id="openTradesTable">
+        <thead>
+          <tr>
+            <th>Pair</th>
+            <th>Lot</th>
+            <th>Posisi</th>
+            <th>Entry</th>
+            <th>Waktu</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="table-wrapper">
+      <h2>✅ History Trading</h2>
+      <table id="tradeHistory">
+        <thead>
+          <tr>
+            <th>Pair</th>
+            <th>Lot</th>
+            <th>Posisi</th>
+            <th>Entry</th>
+            <th>Close</th>
+            <th>Pips</th>
+            <th>USDC</th>
+            <th>Waktu Entry</th>
+            <th>Waktu Close</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="table-wrapper">
+      <h2>📅 Rekap Harian Saldo</h2>
+      <table id="dailyRecap">
+        <thead>
+          <tr>
+            <th>Tanggal</th>
+            <th>Saldo Awal</th>
+            <th>Saldo Akhir</th>
+            <th>Pertumbuhan (%)</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="chart-container">
+      <h2>📉 Live Chart XAUUSD</h2>
+      <iframe src="https://www.tradingview.com/embed-widget/mini-symbol-overview/?symbol=OANDA:XAUUSD&locale=en" allowfullscreen></iframe>
+    </div>
   </div>
 
   <script src="script.js"></script>

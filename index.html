@@ -1,32 +1,67 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Trading Dashboard</title>
   <style>
+    :root {
+      --bg-light: #f9fafc;
+      --bg-dark: #111827;
+      --text-light: #333;
+      --text-dark: #f3f4f6;
+      --card-bg-light: #ffffff;
+      --card-bg-dark: #1f2937;
+      --primary: #3b82f6;
+      --primary-dark: #2563eb;
+      --border-light: #e5e7eb;
+      --border-dark: #374151;
+    }
+
+    [data-theme="dark"] {
+      background: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    [data-theme="dark"] input,
+    [data-theme="dark"] select,
+    [data-theme="dark"] button,
+    [data-theme="dark"] .log,
+    [data-theme="dark"] .display-saldo,
+    [data-theme="dark"] .rekap-profit,
+    [data-theme="dark"] table {
+      background: var(--card-bg-dark);
+      color: var(--text-dark);
+      border-color: var(--border-dark);
+    }
+
+    [data-theme="dark"] th {
+      background-color: #374151;
+    }
+
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       padding: 20px;
       margin: 0;
-      background: linear-gradient(to bottom right, #f9fafc, #eef2f7);
-      color: #333;
+      background: var(--bg-light);
+      color: var(--text-light);
+      transition: all 0.3s ease-in-out;
     }
     h1, h2 {
-      color: #1f2937;
+      color: inherit;
     }
     table {
       width: 100%;
       border-collapse: collapse;
       margin: 15px 0;
-      background: #fff;
+      background: var(--card-bg-light);
       border-radius: 10px;
       overflow: hidden;
       box-shadow: 0 4px 10px rgba(0,0,0,0.06);
       animation: fadeIn 0.5s ease-in-out;
     }
     th, td {
-      border: 1px solid #e5e7eb;
+      border: 1px solid var(--border-light);
       padding: 12px;
       text-align: center;
       font-size: 14px;
@@ -39,7 +74,6 @@
       padding: 10px;
       margin: 5px 0;
       width: 100%;
-      max-width: 100%;
       box-sizing: border-box;
       border: 1px solid #d1d5db;
       border-radius: 6px;
@@ -47,23 +81,23 @@
       transition: all 0.3s ease;
     }
     input:focus, select:focus {
-      border-color: #60a5fa;
+      border-color: var(--primary);
       outline: none;
       box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.3);
     }
     button {
-      background: #3b82f6;
+      background: var(--primary);
       color: #fff;
       border: none;
       cursor: pointer;
       transition: transform 0.2s, background 0.3s;
     }
     button:hover {
-      background: #2563eb;
+      background: var(--primary-dark);
       transform: scale(1.02);
     }
     form {
-      background: #ffffff;
+      background: var(--card-bg-light);
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.05);
@@ -73,7 +107,7 @@
     .log {
       margin-top: 10px;
       font-size: 15px;
-      background: #fff;
+      background: var(--card-bg-light);
       padding: 15px;
       border-radius: 10px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.05);
@@ -82,7 +116,7 @@
     .display-saldo, .rekap-profit {
       font-size: 16px;
       font-weight: bold;
-      background: #ffffff;
+      background: var(--card-bg-light);
       padding: 15px;
       margin-bottom: 20px;
       border-radius: 10px;
@@ -91,11 +125,30 @@
     }
     #chart-container {
       margin: 20px 0;
-      background: #fff;
+      background: var(--card-bg-light);
       border-radius: 10px;
       padding: 10px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.05);
       animation: fadeIn 0.5s ease-in-out;
+    }
+    footer {
+      margin-top: 30px;
+      text-align: center;
+      font-size: 13px;
+      color: #999;
+    }
+    .toggle-theme {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 14px;
+      z-index: 999;
     }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
@@ -113,7 +166,7 @@
         position: relative;
         padding-left: 50%;
         margin-bottom: 10px;
-        background: #fff;
+        background: var(--card-bg-light);
         border-bottom: 1px solid #eee;
       }
       td::before {
@@ -128,6 +181,7 @@
   </style>
 </head>
 <body>
+  <button class="toggle-theme" onclick="toggleTheme()">Switch Theme</button>
   <h1>Trading Dashboard</h1>
 
   <div class="display-saldo">Saldo Awal: <span id="startBalance">1250.00</span> USDC</div>
@@ -143,25 +197,25 @@
     <div id="tradingview_widget"></div>
   </div>
 
-  <form id="tradeForm">
+  <form id="tradeForm" autocomplete="off">
     <label>Pair:</label>
     <select name="pair">
       <option value="XAUUSDc">XAUUSDc</option>
       <option value="BTCUSDc">BTCUSDc</option>
     </select>
-    <label>Layer:</label>
-    <input type="number" name="layer" required />
-    <label>Lot:</label>
-    <input type="number" name="lot" step="0.01" required />
+    <label>Layer (keberapa entry):</label>
+    <input type="number" name="layer" placeholder="Contoh: 1 untuk layer pertama" required />
+    <label>Lot (jumlah kontrak):</label>
+    <input type="number" name="lot" step="0.01" placeholder="Contoh: 0.05" required />
     <label>Posisi:</label>
     <select name="position">
       <option value="BUY">BUY</option>
       <option value="SELL">SELL</option>
     </select>
     <label>Alasan Entry:</label>
-    <input type="text" name="reason" required />
+    <input type="text" name="reason" placeholder="Contoh: Breakout MA50" required />
     <label>Harga Entry (xx.xx):</label>
-    <input type="number" name="entryPrice" step="0.01" required />
+    <input type="number" name="entryPrice" step="0.01" placeholder="Contoh: 1950.25" required />
     <button type="submit">Tambah Entry</button>
   </form>
 
@@ -206,7 +260,17 @@
     <tbody></tbody>
   </table>
 
+  <footer>© 2025 Trading Dashboard. All rights reserved.</footer>
+
   <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+  <script>
+    function toggleTheme() {
+      const html = document.documentElement;
+      const current = html.getAttribute("data-theme") || "light";
+      const next = current === "light" ? "dark" : "light";
+      html.setAttribute("data-theme", next);
+    }
+  </script>
   <script type="text/javascript">
     new TradingView.widget({
       "width": "100%",

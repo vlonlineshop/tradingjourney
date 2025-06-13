@@ -5,27 +5,128 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Trading Dashboard</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 10px; margin: 0; background: #f4f4f4; }
-    h2 { margin-top: 30px; }
-    table { width: 100%; border-collapse: collapse; margin: 10px 0; background: #fff; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-    th { background: #eee; }
-    input, select, button { padding: 5px; margin: 5px 0; width: 100%; max-width: 100%; box-sizing: border-box; }
-    form { background: #fff; padding: 15px; border-radius: 6px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
-    .log { margin-top: 10px; font-size: 14px; background: #fff; padding: 10px; border-radius: 5px; }
-    @media (max-width: 600px) {
-      table, thead, tbody, th, td, tr { display: block; }
-      td { border: none; position: relative; padding-left: 50%; }
-      td::before { content: attr(data-label); position: absolute; left: 10px; font-weight: bold; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 20px;
+      margin: 0;
+      background: #f9fafc;
+      color: #333;
+    }
+    h1, h2 {
+      color: #222;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+      font-size: 14px;
+    }
+    th {
+      background-color: #f0f0f0;
+      font-weight: 600;
+    }
+    input, select, button {
+      padding: 10px;
+      margin: 5px 0;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    button {
+      background: #2c7be5;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #1a5dc9;
+    }
+    form {
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+    }
+    .log {
+      margin-top: 10px;
+      font-size: 15px;
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+    }
+    .display-saldo {
+      font-size: 17px;
+      font-weight: bold;
+      background: #fff;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+    }
+    #chart-container {
+      margin: 20px 0;
+      background: #fff;
+      border-radius: 10px;
+      padding: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    iframe {
+      width: 100%;
+      height: 500px;
+      border: none;
+    }
+    @media (max-width: 768px) {
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+      thead tr {
+        display: none;
+      }
+      td {
+        border: none;
+        position: relative;
+        padding-left: 50%;
+        margin-bottom: 10px;
+        background: #fff;
+        border-bottom: 1px solid #eee;
+      }
+      td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 10px;
+        top: 10px;
+        font-weight: bold;
+        color: #666;
+      }
     }
   </style>
 </head>
 <body>
   <h1>Trading Dashboard</h1>
 
+  <div class="display-saldo">Saldo Awal: <span id="startBalance">1250.00</span> USDC</div>
+
+  <div id="chart-container">
+    <h2>Live Chart XAUUSD</h2>
+    <iframe src="https://www.tradingview.com/embed-widget/single-quote/?symbol=OANDA:XAUUSD" allowfullscreen></iframe>
+  </div>
+
   <form id="tradeForm">
-    <label>Saldo Awal (USDC):</label>
-    <input type="number" id="startBalance" step="0.01" placeholder="Contoh: 1250.00" />
     <label>Pair:</label>
     <select name="pair">
       <option value="XAUUSDc">XAUUSDc</option>

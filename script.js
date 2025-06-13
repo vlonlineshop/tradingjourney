@@ -20,6 +20,7 @@ function renderTrades() {
   historyTable.innerHTML = "";
   let index = 1;
   let wins = 0, losses = 0;
+  let totalProfit = 0;
 
   trades.forEach((t, i) => {
     if (!t.closePrice) {
@@ -38,7 +39,8 @@ function renderTrades() {
       `;
     } else {
       const row = historyTable.insertRow();
-      const profitUSDC = (t.pips * t.lot).toFixed(2);
+      const profitUSDC = (t.pips * t.lot * t.layer).toFixed(2);
+      totalProfit += parseFloat(profitUSDC);
       const result = (t.position === "BUY" && t.pips > 0) || (t.position === "SELL" && t.pips < 0);
       if (result) wins++; else losses++;
 
@@ -61,12 +63,16 @@ function renderTrades() {
 
   const total = wins + losses;
   const winrate = total ? ((wins / total) * 100).toFixed(2) : 0;
-  logBox.innerHTML = `Winrate: ${winrate}% (${wins} win / ${losses} loss)`;
+  logBox.innerHTML = `<strong>Saldo Akhir: ${startBalance.toFixed(2)} USDC</strong><br>Winrate: <strong>${winrate}%</strong> (${wins} win / ${losses} loss)`;
 }
 
-function calcPips(entry, close) {
+function calcPips(entry, close, position) {
   const digits = entry.toString().split(".")[1]?.length || 0;
-  return Math.round((close - entry) * Math.pow(10, digits));
+  const rawPips = Math.round((close - entry) * Math.pow(10, digits));
+  if (position === "SELL") {
+    return -rawPips;
+  }
+  return rawPips;
 }
 
 form.addEventListener("submit", (e) => {
@@ -95,9 +101,8 @@ function closeTrade(index) {
   if (!price) return;
   const closePrice = parseFloat(price);
   const trade = trades[index];
-  const direction = trade.position === "BUY" ? 1 : -1;
-  const pips = calcPips(trade.entryPrice, closePrice) * direction;
-  const profit = pips * trade.lot;
+  const pips = calcPips(trade.entryPrice, closePrice, trade.position);
+  const profit = pips * trade.lot * trade.layer;
   startBalance += profit;
   trade.closePrice = closePrice;
   trade.closeTime = new Date().toLocaleString();

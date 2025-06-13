@@ -9,29 +9,30 @@
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       padding: 20px;
       margin: 0;
-      background: #f9fafc;
+      background: linear-gradient(to bottom right, #f9fafc, #eef2f7);
       color: #333;
     }
     h1, h2 {
-      color: #222;
+      color: #1f2937;
     }
     table {
       width: 100%;
       border-collapse: collapse;
       margin: 15px 0;
       background: #fff;
-      border-radius: 8px;
+      border-radius: 10px;
       overflow: hidden;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+      animation: fadeIn 0.5s ease-in-out;
     }
     th, td {
-      border: 1px solid #ddd;
-      padding: 10px;
+      border: 1px solid #e5e7eb;
+      padding: 12px;
       text-align: center;
       font-size: 14px;
     }
     th {
-      background-color: #f0f0f0;
+      background-color: #f3f4f6;
       font-weight: 600;
     }
     input, select, button {
@@ -40,43 +41,53 @@
       width: 100%;
       max-width: 100%;
       box-sizing: border-box;
-      border: 1px solid #ccc;
-      border-radius: 5px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
       font-size: 14px;
+      transition: all 0.3s ease;
+    }
+    input:focus, select:focus {
+      border-color: #60a5fa;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.3);
     }
     button {
-      background: #2c7be5;
+      background: #3b82f6;
       color: #fff;
       border: none;
       cursor: pointer;
-      transition: background 0.3s ease;
+      transition: transform 0.2s, background 0.3s;
     }
     button:hover {
-      background: #1a5dc9;
+      background: #2563eb;
+      transform: scale(1.02);
     }
     form {
       background: #ffffff;
       padding: 20px;
       border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
       margin-bottom: 20px;
+      animation: fadeIn 0.5s ease-in-out;
     }
     .log {
       margin-top: 10px;
       font-size: 15px;
       background: #fff;
       padding: 15px;
-      border-radius: 8px;
-      box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      animation: fadeIn 0.5s ease-in-out;
     }
-    .display-saldo {
-      font-size: 17px;
+    .display-saldo, .rekap-profit {
+      font-size: 16px;
       font-weight: bold;
-      background: #fff;
+      background: #ffffff;
       padding: 15px;
       margin-bottom: 20px;
       border-radius: 10px;
-      box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      animation: fadeIn 0.5s ease-in-out;
     }
     #chart-container {
       margin: 20px 0;
@@ -84,11 +95,11 @@
       border-radius: 10px;
       padding: 10px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      animation: fadeIn 0.5s ease-in-out;
     }
-    iframe {
-      width: 100%;
-      height: 500px;
-      border: none;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     @media (max-width: 768px) {
       table, thead, tbody, th, td, tr {
@@ -120,12 +131,16 @@
   <h1>Trading Dashboard</h1>
 
   <div class="display-saldo">Saldo Awal: <span id="startBalance">1250.00</span> USDC</div>
-    <div class="log" id="logBox"></div>
-
+  <div class="rekap-profit">
+    Rekap Profit:<br>
+    Total Pips: <span id="totalPips">0</span> pips<br>
+    Total USDC: <span id="totalUsdc">0.00</span> USDC<br>
+    Winrate: <span id="winrate">0%</span>
+  </div>
 
   <div id="chart-container">
     <h2>Live Chart XAUUSD</h2>
-    <iframe src="https://www.tradingview.com/embed-widget/single-quote/?symbol=OANDA:XAUUSD" allowfullscreen></iframe>
+    <div id="tradingview_widget"></div>
   </div>
 
   <form id="tradeForm">
@@ -149,6 +164,8 @@
     <input type="number" name="entryPrice" step="0.01" required />
     <button type="submit">Tambah Entry</button>
   </form>
+
+  <div class="log" id="logBox"></div>
 
   <h2>Open Trades</h2>
   <table id="openTrades">
@@ -189,6 +206,23 @@
     <tbody></tbody>
   </table>
 
+  <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+  <script type="text/javascript">
+    new TradingView.widget({
+      "width": "100%",
+      "height": 500,
+      "symbol": "OANDA:XAUUSD",
+      "interval": "1",
+      "timezone": "Etc/UTC",
+      "theme": "light",
+      "style": "1",
+      "locale": "en",
+      "toolbar_bg": "#f1f3f6",
+      "enable_publishing": false,
+      "allow_symbol_change": true,
+      "container_id": "tradingview_widget"
+    });
+  </script>
   <script src="script.js"></script>
 </body>
 </html>

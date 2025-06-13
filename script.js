@@ -1,6 +1,6 @@
 // script.js
 let trades = JSON.parse(localStorage.getItem("trades")) || [];
-let startBalance = parseFloat(localStorage.getItem("startBalance")) || 1250;
+let startBalance = parseFloat(localStorage.getItem("startBalance")) || 1250.00;
 
 const form = document.getElementById("tradeForm");
 const openTradesTable = document.getElementById("openTrades").querySelector("tbody");
@@ -31,7 +31,7 @@ function renderTrades() {
         <td>${t.layer}</td>
         <td>${t.lot}</td>
         <td>${t.position}</td>
-        <td>${t.entryPrice.toFixed(4)}</td>
+        <td>${t.entryPrice.toFixed(2)}</td>
         <td>${t.openTime}</td>
         <td>${t.reason}</td>
         <td><button onclick="closeTrade(${i})">Close</button></td>
@@ -41,8 +41,8 @@ function renderTrades() {
       const row = historyTable.insertRow();
       const profitUSDC = (t.pips * t.lot * t.layer).toFixed(2);
       totalProfit += parseFloat(profitUSDC);
-      const result = (t.position === "BUY" && t.pips > 0) || (t.position === "SELL" && t.pips < 0);
-      if (result) wins++; else losses++;
+      const isProfit = (t.position === "BUY" && t.pips > 0) || (t.position === "SELL" && t.pips < 0);
+      if (isProfit) wins++; else losses++;
 
       row.innerHTML = `
         <td>${index}</td>
@@ -50,8 +50,8 @@ function renderTrades() {
         <td>${t.layer}</td>
         <td>${t.lot}</td>
         <td>${t.position}</td>
-        <td>${t.entryPrice.toFixed(4)}</td>
-        <td>${t.closePrice.toFixed(4)}</td>
+        <td>${t.entryPrice.toFixed(2)}</td>
+        <td>${t.closePrice.toFixed(2)}</td>
         <td>${t.openTime}</td>
         <td>${t.closeTime}</td>
         <td>${t.pips}</td>
@@ -67,12 +67,11 @@ function renderTrades() {
 }
 
 function calcPips(entry, close, position) {
-  const digits = entry.toString().split(".")[1]?.length || 0;
-  const rawPips = Math.round((close - entry) * Math.pow(10, digits));
+  const pips = Math.round((close - entry) * 100); // 2 digit desimal
   if (position === "SELL") {
-    return -rawPips;
+    return -pips;
   }
-  return rawPips;
+  return pips;
 }
 
 form.addEventListener("submit", (e) => {

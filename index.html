@@ -123,6 +123,11 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.05);
       animation: fadeIn 0.5s ease-in-out;
     }
+    .rekap-profit span {
+      display: inline-block;
+      margin-bottom: 4px;
+      transition: all 0.3s ease-in-out;
+    }
     #chart-container {
       margin: 20px 0;
       background: var(--card-bg-light);
@@ -186,10 +191,13 @@
 
   <div class="display-saldo">Saldo Awal: <span id="startBalance">1250.00</span> USDC</div>
   <div class="rekap-profit">
-    Rekap Profit:<br>
-    Total Pips: <span id="totalPips">0</span> pips<br>
-    Total USDC: <span id="totalUsdc">0.00</span> USDC<br>
-    Winrate: <span id="winrate">0%</span>
+    📈 <strong>Rekap Profit:</strong><br>
+    ✅ Total Trade: <span id="totalTrade">0</span><br>
+    🟢 Win Trade: <span id="winTrade">0</span><br>
+    🔴 Loss Trade: <span id="lossTrade">0</span><br>
+    📊 Winrate: <span id="winrate">0%</span><br>
+    💹 Total Pips: <span id="totalPips">0</span> pips<br>
+    💰 Total USDC: <span id="totalUsdc">0.00</span> USDC
   </div>
 
   <div id="chart-container">

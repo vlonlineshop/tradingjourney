@@ -1,194 +1,125 @@
-<!-- FINAL Trading Dashboard Panel + Live Chart XAUUSD -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Trading Dashboard Panel</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #f2f4f8;
-    }
-    header {
-      background: #0077cc;
-      color: #fff;
-      padding: 15px;
-      text-align: center;
-    }
-    .container {
-      max-width: 900px;
-      margin: 20px auto;
-      padding: 20px;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-    }
-    .section {
-      margin-bottom: 30px;
-    }
-    h3 {
-      border-left: 5px solid #0077cc;
-      padding-left: 10px;
-      margin-bottom: 15px;
-    }
-    label {
-      font-weight: bold;
-      display: block;
-      margin-top: 10px;
-    }
-    input, select, button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      margin-bottom: 10px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      font-size: 14px;
-    }
-    button {
-      background: #0077cc;
-      color: white;
-      border: none;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    button:hover {
-      background: #005fa3;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    th, td {
-      padding: 10px;
-      border: 1px solid #ddd;
-      text-align: center;
-      font-size: 14px;
-    }
-    th {
-      background-color: #0077cc;
-      color: white;
-    }
-    iframe {
-      border: none;
-      width: 100%;
-      height: 400px;
-    }
-    .log-box {
-      background: #f8f9fb;
-      padding: 10px;
-      border-radius: 5px;
-      max-height: 200px;
-      overflow-y: auto;
-      font-size: 13px;
-      border: 1px solid #ddd;
-    }
-    @media (max-width: 600px) {
-      input, select, button, th, td {
-        font-size: 12px;
-      }
-      h3 {
-        font-size: 16px;
-      }
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <h2>Trading Dashboard Panel</h2>
-  </header>
-  <div class="container">
-    <div class="section">
-      <h3>Live Chart XAUUSD</h3>
-      <iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_1d458&symbol=OANDA%3AXAUUSD&interval=5&hidesidetoolbar=1&symboledit=1&saveimage=1&toolbarbg=f1f3f6&studies=[]&theme=Light&style=1&timezone=Asia%2FJakarta&studies_overrides={}&overrides={}&enabled_features=[]&disabled_features=[]&locale=en"></iframe>
-    </div>
+// script.js
+let trades = JSON.parse(localStorage.getItem("trades")) || [];
+let startBalance = parseFloat(localStorage.getItem("startBalance")) || 1250.00;
 
-    <div class="section">
-      <h3>Input Trading</h3>
-      <form id="tradeForm">
-        <label>Saldo Awal (USDC)</label>
-        <input type="number" id="startBalance" step="0.01" placeholder="1250.00" required />
+const form = document.getElementById("tradeForm");
+const openTradesTable = document.getElementById("openTrades").querySelector("tbody");
+const historyTable = document.getElementById("history").querySelector("tbody");
+const logBox = document.getElementById("logBox");
+const startBalanceInput = document.getElementById("startBalance");
 
-        <label>Pair Option</label>
-        <select id="pair">
-          <option>XAUUSDc</option>
-          <option>BTCUSDc</option>
-        </select>
+startBalanceInput.value = startBalance.toFixed(2);
 
-        <label>Layer</label>
-        <input type="number" id="layer" min="1" value="1" required />
+function saveTrades() {
+  localStorage.setItem("trades", JSON.stringify(trades));
+  localStorage.setItem("startBalance", startBalance.toFixed(2));
+}
 
-        <label>Lot</label>
-        <input type="number" id="lot" step="0.01" value="0.01" required />
+function renderTrades() {
+  openTradesTable.innerHTML = "";
+  historyTable.innerHTML = "";
+  let wins = 0, losses = 0;
+  let totalProfit = 0;
 
-        <label>Posisi Option</label>
-        <select id="position">
-          <option>BUY</option>
-          <option>SELL</option>
-        </select>
+  // Urutkan trades berdasarkan waktu open
+  const sortedTrades = trades.slice().sort((a, b) => new Date(a.openTime) - new Date(b.openTime));
 
-        <label>Alasan Entry</label>
-        <input type="text" id="reason" placeholder="Misalnya: Breakout, MA50 support" required />
+  sortedTrades.forEach((t, i) => {
+    const index = i + 1;
+    if (!t.closePrice) {
+      const row = openTradesTable.insertRow();
+      row.innerHTML = `
+        <td>${index}</td>
+        <td>${t.pair}</td>
+        <td>${t.layer}</td>
+        <td>${t.lot}</td>
+        <td>${t.position}</td>
+        <td>${t.entryPrice.toFixed(2)}</td>
+        <td>${t.openTime}</td>
+        <td>${t.reason}</td>
+        <td><button onclick="closeTrade(${trades.indexOf(t)})">Close</button></td>
+        <td><button onclick="deleteTrade(${trades.indexOf(t)})">Hapus</button></td>
+      `;
+    } else {
+      const row = historyTable.insertRow();
+      const profitUSDC = (t.pips * t.lot * t.layer).toFixed(2);
+      totalProfit += parseFloat(profitUSDC);
+      const isProfit = (t.position === "BUY" && t.pips > 0) || (t.position === "SELL" && t.pips < 0);
+      if (isProfit) wins++; else losses++;
 
-        <label>Harga Entry</label>
-        <input type="number" id="entryPrice" step="0.0001" required />
+      row.innerHTML = `
+        <td>${index}</td>
+        <td>${t.pair}</td>
+        <td>${t.layer}</td>
+        <td>${t.lot}</td>
+        <td>${t.position}</td>
+        <td>${t.entryPrice.toFixed(2)}</td>
+        <td>${t.closePrice.toFixed(2)}</td>
+        <td>${t.openTime}</td>
+        <td>${t.closeTime}</td>
+        <td>${t.pips}</td>
+        <td>${profitUSDC} USDC</td>
+      `;
+    }
+  });
 
-        <button type="submit">Tambahkan Entry</button>
-      </form>
-    </div>
+  const total = wins + losses;
+  const winrate = total ? ((wins / total) * 100).toFixed(2) : 0;
+  logBox.innerHTML = `<strong>Saldo Akhir: ${startBalance.toFixed(2)} USDC</strong><br>Winrate: <strong>${winrate}%</strong> (${wins} win / ${losses} loss)`;
+}
 
-    <div class="section">
-      <h3>Posisi Terbuka</h3>
-      <table id="openTrades">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Pair</th>
-            <th>Layer</th>
-            <th>Lot</th>
-            <th>Posisi</th>
-            <th>Entry</th>
-            <th>Waktu</th>
-            <th>Alasan</th>
-            <th>Close</th>
-            <th>Delete</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
+function calcPips(entry, close, position) {
+  const diff = parseFloat((close - entry).toFixed(2));
+  const pips = Math.round(diff * 100);
+  if (position === "SELL") {
+    return -pips;
+  }
+  return pips;
+}
 
-    <div class="section">
-      <h3>History Trade</h3>
-      <table id="history">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Pair</th>
-            <th>Layer</th>
-            <th>Lot</th>
-            <th>Posisi</th>
-            <th>Entry</th>
-            <th>Close</th>
-            <th>Waktu Entry</th>
-            <th>Waktu Close</th>
-            <th>Pips</th>
-            <th>Profit/Loss</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const data = {
+    pair: form.pair.value,
+    layer: parseInt(form.layer.value),
+    lot: parseFloat(form.lot.value),
+    position: form.position.value,
+    reason: form.reason.value,
+    entryPrice: parseFloat(parseFloat(form.entryPrice.value).toFixed(2)),
+    openTime: new Date().toLocaleString(),
+    closePrice: null,
+    closeTime: null,
+    pips: null
+  };
+  trades.push(data);
+  saveTrades();
+  renderTrades();
+  form.reset();
+  startBalance = parseFloat(startBalanceInput.value);
+});
 
-    <div class="section">
-      <h3>Log Aktivitas</h3>
-      <div class="log-box" id="logBox"></div>
-    </div>
-  </div>
-  <script src="script.js"></script>
-</body>
-</html>
+function closeTrade(index) {
+  const price = prompt("Masukkan harga close:");
+  if (!price) return;
+  const closePrice = parseFloat(parseFloat(price).toFixed(2));
+  const trade = trades[index];
+  const pips = calcPips(trade.entryPrice, closePrice, trade.position);
+  const profit = pips * trade.lot * trade.layer;
+  startBalance += profit;
+  trade.closePrice = closePrice;
+  trade.closeTime = new Date().toLocaleString();
+  trade.pips = pips;
+  saveTrades();
+  renderTrades();
+  startBalanceInput.value = startBalance.toFixed(2);
+}
+
+function deleteTrade(index) {
+  if (confirm("Yakin ingin menghapus entry ini?")) {
+    trades.splice(index, 1);
+    saveTrades();
+    renderTrades();
+  }
+}
+
+renderTrades();

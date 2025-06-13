@@ -32,11 +32,11 @@
         <span id="totalTrades">0</span>
       </div>
       <div class="stat-box">
-        <h3>Win Trade</h3>
+        <h3>Win Trade ✅</h3>
         <span id="winTrades">0</span>
       </div>
       <div class="stat-box">
-        <h3>Loss Trade</h3>
+        <h3>Loss Trade ❌</h3>
         <span id="lossTrades">0</span>
       </div>
       <div class="stat-box">
@@ -55,7 +55,8 @@
         <option value="BUY">BUY</option>
         <option value="SELL">SELL</option>
       </select>
-      <input type="number" step="0.01" id="entryPrice" placeholder="Harga Entry" required />
+      <input type="text" id="reason" placeholder="Alasan Entry" required />
+      <input type="number" step="0.01" id="entryPrice" placeholder="Harga Entry (xxxx.xx)" required />
       <button type="submit">Tambah Posisi</button>
     </form>
 
@@ -68,11 +69,12 @@
             <th>Lot</th>
             <th>Posisi</th>
             <th>Entry</th>
+            <th>Alasan</th>
             <th>Waktu</th>
             <th>Action</th>
           </tr>
         </thead>
-        <tbody></tbody>
+        <tbody id="openTradesBody"></tbody>
       </table>
     </div>
 

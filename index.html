@@ -1,125 +1,93 @@
-// script.js
-let trades = JSON.parse(localStorage.getItem("trades")) || [];
-let startBalance = parseFloat(localStorage.getItem("startBalance")) || 1250.00;
-
-const form = document.getElementById("tradeForm");
-const openTradesTable = document.getElementById("openTrades").querySelector("tbody");
-const historyTable = document.getElementById("history").querySelector("tbody");
-const logBox = document.getElementById("logBox");
-const startBalanceInput = document.getElementById("startBalance");
-
-startBalanceInput.value = startBalance.toFixed(2);
-
-function saveTrades() {
-  localStorage.setItem("trades", JSON.stringify(trades));
-  localStorage.setItem("startBalance", startBalance.toFixed(2));
-}
-
-function renderTrades() {
-  openTradesTable.innerHTML = "";
-  historyTable.innerHTML = "";
-  let wins = 0, losses = 0;
-  let totalProfit = 0;
-
-  // Urutkan trades berdasarkan waktu open
-  const sortedTrades = trades.slice().sort((a, b) => new Date(a.openTime) - new Date(b.openTime));
-
-  sortedTrades.forEach((t, i) => {
-    const index = i + 1;
-    if (!t.closePrice) {
-      const row = openTradesTable.insertRow();
-      row.innerHTML = `
-        <td>${index}</td>
-        <td>${t.pair}</td>
-        <td>${t.layer}</td>
-        <td>${t.lot}</td>
-        <td>${t.position}</td>
-        <td>${t.entryPrice.toFixed(2)}</td>
-        <td>${t.openTime}</td>
-        <td>${t.reason}</td>
-        <td><button onclick="closeTrade(${trades.indexOf(t)})">Close</button></td>
-        <td><button onclick="deleteTrade(${trades.indexOf(t)})">Hapus</button></td>
-      `;
-    } else {
-      const row = historyTable.insertRow();
-      const profitUSDC = (t.pips * t.lot * t.layer).toFixed(2);
-      totalProfit += parseFloat(profitUSDC);
-      const isProfit = (t.position === "BUY" && t.pips > 0) || (t.position === "SELL" && t.pips < 0);
-      if (isProfit) wins++; else losses++;
-
-      row.innerHTML = `
-        <td>${index}</td>
-        <td>${t.pair}</td>
-        <td>${t.layer}</td>
-        <td>${t.lot}</td>
-        <td>${t.position}</td>
-        <td>${t.entryPrice.toFixed(2)}</td>
-        <td>${t.closePrice.toFixed(2)}</td>
-        <td>${t.openTime}</td>
-        <td>${t.closeTime}</td>
-        <td>${t.pips}</td>
-        <td>${profitUSDC} USDC</td>
-      `;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trading Dashboard</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 10px; margin: 0; background: #f4f4f4; }
+    h2 { margin-top: 30px; }
+    table { width: 100%; border-collapse: collapse; margin: 10px 0; background: #fff; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background: #eee; }
+    input, select, button { padding: 5px; margin: 5px 0; width: 100%; max-width: 100%; box-sizing: border-box; }
+    form { background: #fff; padding: 15px; border-radius: 6px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
+    .log { margin-top: 10px; font-size: 14px; background: #fff; padding: 10px; border-radius: 5px; }
+    @media (max-width: 600px) {
+      table, thead, tbody, th, td, tr { display: block; }
+      td { border: none; position: relative; padding-left: 50%; }
+      td::before { content: attr(data-label); position: absolute; left: 10px; font-weight: bold; }
     }
-  });
+  </style>
+</head>
+<body>
+  <h1>Trading Dashboard</h1>
 
-  const total = wins + losses;
-  const winrate = total ? ((wins / total) * 100).toFixed(2) : 0;
-  logBox.innerHTML = `<strong>Saldo Akhir: ${startBalance.toFixed(2)} USDC</strong><br>Winrate: <strong>${winrate}%</strong> (${wins} win / ${losses} loss)`;
-}
+  <form id="tradeForm">
+    <label>Saldo Awal (USDC):</label>
+    <input type="number" id="startBalance" step="0.01" placeholder="Contoh: 1250.00" />
+    <label>Pair:</label>
+    <select name="pair">
+      <option value="XAUUSDc">XAUUSDc</option>
+      <option value="BTCUSDc">BTCUSDc</option>
+    </select>
+    <label>Layer:</label>
+    <input type="number" name="layer" required />
+    <label>Lot:</label>
+    <input type="number" name="lot" step="0.01" required />
+    <label>Posisi:</label>
+    <select name="position">
+      <option value="BUY">BUY</option>
+      <option value="SELL">SELL</option>
+    </select>
+    <label>Alasan Entry:</label>
+    <input type="text" name="reason" required />
+    <label>Harga Entry (xx.xx):</label>
+    <input type="number" name="entryPrice" step="0.01" required />
+    <button type="submit">Tambah Entry</button>
+  </form>
 
-function calcPips(entry, close, position) {
-  const diff = parseFloat((close - entry).toFixed(2));
-  const pips = Math.round(diff * 100);
-  if (position === "SELL") {
-    return -pips;
-  }
-  return pips;
-}
+  <div class="log" id="logBox"></div>
 
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const data = {
-    pair: form.pair.value,
-    layer: parseInt(form.layer.value),
-    lot: parseFloat(form.lot.value),
-    position: form.position.value,
-    reason: form.reason.value,
-    entryPrice: parseFloat(parseFloat(form.entryPrice.value).toFixed(2)),
-    openTime: new Date().toLocaleString(),
-    closePrice: null,
-    closeTime: null,
-    pips: null
-  };
-  trades.push(data);
-  saveTrades();
-  renderTrades();
-  form.reset();
-  startBalance = parseFloat(startBalanceInput.value);
-});
+  <h2>Open Trades</h2>
+  <table id="openTrades">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Pair</th>
+        <th>Layer</th>
+        <th>Lot</th>
+        <th>Posisi</th>
+        <th>Entry</th>
+        <th>Waktu Open</th>
+        <th>Alasan</th>
+        <th>Close</th>
+        <th>Hapus</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
-function closeTrade(index) {
-  const price = prompt("Masukkan harga close:");
-  if (!price) return;
-  const closePrice = parseFloat(parseFloat(price).toFixed(2));
-  const trade = trades[index];
-  const pips = calcPips(trade.entryPrice, closePrice, trade.position);
-  const profit = pips * trade.lot * trade.layer;
-  startBalance += profit;
-  trade.closePrice = closePrice;
-  trade.closeTime = new Date().toLocaleString();
-  trade.pips = pips;
-  saveTrades();
-  renderTrades();
-  startBalanceInput.value = startBalance.toFixed(2);
-}
+  <h2>History Trades</h2>
+  <table id="history">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Pair</th>
+        <th>Layer</th>
+        <th>Lot</th>
+        <th>Posisi</th>
+        <th>Entry</th>
+        <th>Close</th>
+        <th>Waktu Open</th>
+        <th>Waktu Close</th>
+        <th>Pips</th>
+        <th>Profit (USDC)</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
-function deleteTrade(index) {
-  if (confirm("Yakin ingin menghapus entry ini?")) {
-    trades.splice(index, 1);
-    saveTrades();
-    renderTrades();
-  }
-}
-
-renderTrades();
+  <script src="script.js"></script>
+</body>
+</html>

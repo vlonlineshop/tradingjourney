@@ -1,144 +1,232 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Risk Management - XAUUSD</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Risk-Based Layer Simulator Final</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #111;
-      color: #0ff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      color: #f0f0f0;
       padding: 20px;
+      line-height: 1.6;
     }
-    h1, h3 {
-      color: #0ff;
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     }
     input {
-      padding: 5px;
-      margin: 5px;
-      width: 100px;
-    }
-    #layersTable {
-      margin-top: 20px;
       width: 100%;
-      border-collapse: collapse;
     }
-    #layersTable th, #layersTable td {
-      border: 1px solid #0ff;
-      padding: 8px;
-      text-align: center;
+    button {
+      background-color: #00b894;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
     }
-    #riskBarContainer {
+    button:hover {
+      background-color: #019875;
+    }
+    .risk-bar {
       width: 100%;
-      height: 25px;
-      background: #033;
-      border-radius: 6px;
-      margin-top: 10px;
+      height: 20px;
+      background: #555;
+      border-radius: 10px;
       overflow: hidden;
-      box-shadow: 0 0 10px #0ff5;
+      margin: 20px 0;
     }
-    #riskBar {
+    .risk-fill {
       height: 100%;
-      width: 0%;
-      background-color: green;
-      transition: width 0.5s ease, background-color 0.5s ease;
-      border-radius: 6px;
+      width: 0;
+      background: green;
+      transition: width 0.3s ease-in-out;
     }
-    #riskLabel {
-      color: #0ff;
-      margin-top: 5px;
-      font-weight: bold;
+    .layer {
+      margin: 5px 0;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 5px;
+    }
+    .profit { color: #00ff9d; }
+    .loss { color: #ff6b6b; }
+    .floating { color: #ffe66d; }
+    h1, h2, h3 {
+      color: #ffffff;
+    }
+    canvas {
+      background: #1e272e;
+      border: 1px solid #3742fa;
+      border-radius: 8px;
+      display: block;
+      margin: 20px 0;
+    }
+    #info p, #simulation p, #simulation h3 {
+      margin: 5px 0;
     }
   </style>
 </head>
 <body>
-  <h1>Risk Management - XAUUSD</h1>
-  <label for="balance">Saldo ($):</label>
-  <input type="number" id="balance" value="1000" />
-  <button onclick="calculateLayers()">Hitung Layer</button>
 
-  <div id="output"></div>
+<h1>Simulasi Risk Management</h1>
 
-  <h3>Risk Persentase</h3>
-  <div id="riskBarContainer">
-    <div id="riskBar"></div>
-  </div>
-  <p id="riskLabel">Risk: 0%</p>
+<label>Saldo ($):</label><br>
+<input type="number" id="saldoInput" value="1000"><br>
 
-  <table id="layersTable">
-    <thead>
-      <tr>
-        <th>Layer</th>
-        <th>Entry Price</th>
-        <th>Stop Loss</th>
-        <th>Take Profit</th>
-        <th>Lot</th>
-      </tr>
-    </thead>
-    <tbody id="tableBody"></tbody>
-  </table>
+<label>Harga Awal:</label><br>
+<input type="number" id="startPriceInput" value="3320.00" step="0.01"><br>
 
-  <script>
-    function calculateLayers() {
-      const balance = parseFloat(document.getElementById("balance").value);
-      const riskPercent = 10;
-      const lotSize = 0.01;
-      const stopLossPerLayer = 25; // in pips
-      const pipValue = 1; // USD per pip for 0.01 lot XAUUSD
-      const maxLayers = 5;
-      const pipDistance = 5; // pips between layers
+<button onclick="startSimulation()">Mulai Simulasi</button>
 
-      const riskAmount = (balance * riskPercent) / 100;
-      const riskPerLayer = lotSize * stopLossPerLayer * pipValue;
-      const totalRiskUsed = riskPerLayer * maxLayers;
+<div id="info"></div>
+<div class="risk-bar"><div id="risk-fill" class="risk-fill"></div></div>
+<div id="simulation"></div>
+<canvas id="priceChart" width="600" height="200"></canvas>
 
-      // Entry logic (BUY case)
-      const firstEntry = 3320.0;
-      const pipFactor = 0.10; // 1 pip = 0.10 for XAUUSD format xxxx.xx
+<script>
+function generatePricePath(start) {
+  const steps = 100;
+  const path = [];
+  let current = start;
+  for (let i = 0; i < steps; i++) {
+    if (i < 10) {
+      current -= 0.1;
+    } else {
+      const rand = Math.random();
+      current += rand < 0.7 ? 0.1 : -0.05;
+    }
+    path.push(parseFloat(current.toFixed(2)));
+  }
+  return path;
+}
 
-      const tableBody = document.getElementById("tableBody");
-      tableBody.innerHTML = "";
+function startSimulation() {
+  const saldo = parseFloat(document.getElementById("saldoInput").value);
+  const startPrice = parseFloat(document.getElementById("startPriceInput").value);
+  const risk = saldo * 0.10;
+  const pipStep = 0.50;
+  const pipValuePer01Lot = 0.10;
+  const maxLayers = 5;
+  const multiplier = 1.05;
 
-      for (let i = 0; i < maxLayers; i++) {
-        const entry = firstEntry - i * pipDistance * pipFactor;
-        const sl = entry - stopLossPerLayer * pipFactor;
-        const tp = firstEntry + 40 * pipFactor;
+  const maxLotBySaldo = saldo * 0.05;
 
-        const row = `<tr>
-          <td>Layer ${i + 1}</td>
-          <td>${entry.toFixed(2)}</td>
-          <td>${sl.toFixed(2)}</td>
-          <td>${tp.toFixed(2)}</td>
-          <td>${lotSize.toFixed(2)}</td>
-        </tr>`;
+  const baseLot = Math.min(calculateBaseLot(risk, pipStep, pipValuePer01Lot, maxLayers, multiplier), maxLotBySaldo);
 
-        tableBody.innerHTML += row;
-      }
+  const layers = [];
+  let lot = baseLot;
+  for (let i = 0; i < maxLayers; i++) {
+    lot = Math.floor(Math.max(0.01, lot) * 100) / 100;
+    const entry = parseFloat((startPrice - pipStep * (i + 1)).toFixed(2));
+    layers.push({ layer: i + 1, entry, lot, active: false, pips: 0, usd: 0 });
+    lot *= 1.05;
+  }
 
-      // Update risk bar
-      updateRiskBar(balance, totalRiskUsed);
+  document.getElementById("info").innerHTML = `
+    <p><strong>Saldo:</strong> $${saldo}</p>
+    <p><strong>Max Risk (10%):</strong> $${risk.toFixed(2)}</p>
+    <p><strong>Lot Layer 1:</strong> ${baseLot.toFixed(2)} lot</p>
+  `;
+
+  const prices = generatePricePath(startPrice);
+  const simulationDiv = document.getElementById("simulation");
+  const riskFill = document.getElementById("risk-fill");
+  const ctx = document.getElementById("priceChart").getContext("2d");
+
+  let i = 0;
+  const pricePoints = [];
+
+  const interval = setInterval(() => {
+    const price = prices[i];
+    if (!price) {
+      clearInterval(interval);
+      return;
     }
 
-    function updateRiskBar(balance, riskUsed) {
-      let riskPercentage = (riskUsed / balance) * 100;
-      const bar = document.getElementById("riskBar");
-      const label = document.getElementById("riskLabel");
+    simulationDiv.innerHTML = `<h2>Harga Saat Ini: ${price.toFixed(2)}</h2>`;
+    let totalFloat = 0;
 
-      bar.style.width = Math.min(riskPercentage, 100) + "%";
-      label.textContent = `Risk: ${riskPercentage.toFixed(1)}%`;
-
-      if (riskPercentage <= 25) {
-        bar.style.backgroundColor = "green";
-      } else if (riskPercentage <= 50) {
-        bar.style.backgroundColor = "yellow";
-      } else {
-        bar.style.backgroundColor = "red";
+    layers.forEach(layer => {
+      if (!layer.active && price <= layer.entry) {
+        layer.active = true;
       }
+
+      if (layer.active) {
+        const pips = (price - layer.entry) * 10;
+        const valuePerPip = (layer.lot / 0.01) * pipValuePer01Lot;
+        const usd = pips * valuePerPip;
+        layer.pips = pips;
+        layer.usd = usd;
+        totalFloat += usd;
+
+        const cls = usd > 0 ? 'profit' : usd < 0 ? 'floating' : 'loss';
+        simulationDiv.innerHTML += `
+          <div class="layer ${cls}">
+            Layer ${layer.layer}: Entry ${layer.entry.toFixed(2)} | Lot ${layer.lot.toFixed(2)} lot → 
+            ${pips.toFixed(1)} pips | $${usd.toFixed(2)}
+          </div>`;
+      }
+    });
+
+    simulationDiv.innerHTML += `<h3>Total Floating: $${totalFloat.toFixed(2)}</h3>`;
+
+    const usage = Math.min(Math.abs(totalFloat) / risk, 1);
+    riskFill.style.width = `${usage * 100}%`;
+    riskFill.style.background = usage < 0.5 ? 'green' : usage < 0.8 ? 'yellow' : 'red';
+
+    pricePoints.push(price);
+    drawChart(ctx, pricePoints);
+
+    i++;
+  }, 300);
+}
+
+function calculateBaseLot(maxLoss, pipStep, pipValuePer01Lot, layerCount, multiplier) {
+  const safetyFactor = 0.9;
+  let bestLot = 0.01;
+
+  for (let lot = 0.01; lot <= 10; lot += 0.01) {
+    lot = Math.floor(lot * 100) / 100;
+    let totalLoss = 0;
+    let currentLot = lot;
+
+    for (let i = 0; i < layerCount; i++) {
+      const pips = pipStep * (i + 1);
+      const valuePerPip = (currentLot / 0.01) * pipValuePer01Lot;
+      const loss = pips * valuePerPip;
+      totalLoss += loss;
+      currentLot *= multiplier;
     }
 
-    // Initial calculate
-    calculateLayers();
-  </script>
+    if (totalLoss > maxLoss * safetyFactor) {
+      break;
+    }
+
+    bestLot = lot;
+  }
+
+  return bestLot;
+}
+
+function drawChart(ctx, data) {
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  ctx.beginPath();
+  ctx.strokeStyle = '#00cec9';
+  ctx.lineWidth = 2;
+  const step = ctx.canvas.width / (data.length - 1);
+  data.forEach((val, i) => {
+    const x = i * step;
+    const y = ctx.canvas.height - ((val - Math.min(...data)) / (Math.max(...data) - Math.min(...data))) * ctx.canvas.height;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+}
+</script>
+
 </body>
 </html>

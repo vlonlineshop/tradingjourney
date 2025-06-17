@@ -268,7 +268,7 @@ function validateAccess() {
   const code = input.value.trim().toUpperCase();
   if (code === 'VL') {
     document.getElementById('authContainer').style.display = 'none';
-    document.getElementById('mainContent').style.display = 'block';
+    document.getElementById('mainContent').style.display = 'none';
     if (typeof calculateLayers === "function") calculateLayers();
     loadFromLocalStorage();
   } else {

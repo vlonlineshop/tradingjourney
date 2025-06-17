@@ -1,362 +1,436 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Risk Management - XAUUSD</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #000;
-      color: #0ff;
-    }
-
-    /* Neon Login Container */
-    #authContainer {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      background: radial-gradient(circle at center, #001e2f 0%, #000 100%);
-      animation: pulseGlow 5s infinite alternate;
-      box-shadow: inset 0 0 50px #00f2ff33;
-      border-radius: 12px;
-      padding: 40px;
-      text-align: center;
-    }
-
-    #authContainer h1 {
-      font-size: 2.5rem;
-      text-shadow: 0 0 10px #0ff, 0 0 20px #0ff2;
-    }
-
-    #authContainer p {
-      font-size: 1.2rem;
-      color: #88f;
-      text-shadow: 0 0 5px #0ff2;
-    }
-
-    #accessCode {
-      padding: 12px;
-      font-size: 1.1rem;
-      width: 240px;
-      border: none;
-      border-radius: 8px;
-      background: #020b14;
-      color: #0ff;
-      outline: none;
-      box-shadow: 0 0 10px #00f2ff88;
-    }
-
-    #accessCode:focus {
-      box-shadow: 0 0 20px #00f2ffcc;
-    }
-
-    #authContainer button {
-      margin-top: 20px;
-      padding: 10px 24px;
-      background: #00aaff;
-      border: none;
-      border-radius: 6px;
-      color: #fff;
-      font-size: 1.1rem;
-      cursor: pointer;
-      box-shadow: 0 0 10px #00f2ffaa;
-      transition: background 0.3s ease, transform 0.3s ease;
-    }
-
-    #authContainer button:hover {
-      background: #008ecc;
-      transform: scale(1.05);
-      box-shadow: 0 0 20px #00f2ffff;
-    }
-
-    @keyframes pulseGlow {
-      0% { box-shadow: inset 0 0 30px #00f2ff33; }
-      100% { box-shadow: inset 0 0 60px #00f2ff99; }
-    }
-
-    /* Risk Management Content (Hidden by default) */
-    #mainContent {
-      display: none;
-      padding: 20px;
-      animation: fadeIn 1s ease forwards;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.98); }
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    h1, h3 {
-      color: #00f7ff;
-      border-bottom: 2px solid #0ff5;
-      padding-bottom: 5px;
-    }
-
-    input, button {
-      font-size: 16px;
-    }
-
-    input {
-      padding: 8px;
-      margin: 10px 5px;
-      width: 150px;
-      border: 1px solid #0ff;
-      background-color: #111;
-      color: #0ff;
-      border-radius: 4px;
-    }
-
-    nav {
-      background: #011;
-      padding: 10px;
-      margin-bottom: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px #0ff5;
-    }
-
-    nav a {
-      color: #0ff;
-      text-decoration: none;
-      margin: 0 15px;
-      font-weight: bold;
-    }
-
-    nav a:hover {
-      text-decoration: underline;
-    }
-
-    table {
-      margin-top: 20px;
-      width: 100%;
-      border-collapse: collapse;
-      box-shadow: 0 0 10px #0ff3;
-    }
-
-    th, td {
-      border: 1px solid #0ff;
-      padding: 10px;
-      text-align: center;
-      background-color: #111;
-    }
-
-    th {
-      background-color: #033;
-      color: #0ff;
-    }
-
-    #riskBarContainer {
-      width: 100%;
-      height: 30px;
-      background: #022;
-      border-radius: 6px;
-      margin-top: 10px;
-      overflow: hidden;
-      box-shadow: 0 0 10px #0ff5;
-    }
-
-    #riskBar {
-      height: 100%;
-      width: 0%;
-      background-color: green;
-      transition: width 0.5s ease, background-color 0.5s ease;
-      border-radius: 6px;
-    }
-
-    #riskLabel {
-      color: #0ff;
-      margin-top: 5px;
-      font-weight: bold;
-      font-size: 18px;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Trading Journey Harian & Rekap</title>
+<style>
+  body {
+    background: #0a0f14;
+    color: #0ff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0; padding: 20px;
+  }
+  .container {
+    max-width: 900px;
+    margin: auto;
+    background: #121a26;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px #0ff6;
+  }
+  input[type=text], input[type=number], select {
+    width: 200px;
+    padding: 10px;
+    border: 2px solid #0ff;
+    border-radius: 5px;
+    background: #01111f;
+    color: #0ff;
+    font-size: 16px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+  }
+  button {
+    padding: 10px 20px;
+    background: #0ff;
+    border: none;
+    border-radius: 5px;
+    color: #012;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  button:hover {
+    background: #06c;
+    color: #aaffff;
+  }
+  #dashboard {
+    margin-top: 30px;
+    display: none;
+    animation: fadeIn 1s ease forwards;
+  }
+  @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+  }
+  th, td {
+    border: 1px solid #0ff;
+    padding: 8px;
+    text-align: center;
+  }
+  th {
+    background-color: #022;
+    color: #0ff;
+  }
+  .stats {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+  }
+  .stat-box {
+    background: #01111f;
+    padding: 10px 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px #0ff7;
+    min-width: 120px;
+    margin: 5px;
+  }
+  #analysis {
+    margin-top: 15px;
+    background: #022;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px #0ff8;
+    min-height: 50px;
+    font-weight: bold;
+  }
+  nav {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+  }
+  nav a {
+    color: #0ff;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s;
+  }
+  nav a:hover {
+    color: #fff;
+  }
+</style>
 </head>
-<body oncontextmenu="return false">
+<body>
+<div class="container">
+  <nav>
+    <a href="index.html">Dashboard</a>
+    <a href="risk-management.html">Risk Management</a>
+    <a href="maintenance.html">Money Management</a>
+  </nav>
 
-  <!-- AUTH GATE -->
-  <div id="authContainer">
-    <h1>🔐 Akses Terbatas</h1>
-    <p>Masukkan Kode Akses</p>
-    <input type="password" id="accessCode" placeholder="Kode Akses..." />
-    <button onclick="validateAccess()">Masuk</button>
-  </div>
+  <h1>Login Trading Journey</h1>
+  <form id="loginForm">
+    <label for="accessCode">Masukkan Kode Akses: </label>
+    <input type="text" id="accessCode" required autocomplete="off" />
+    <button type="submit">Login</button>
+  </form>
 
-  <!-- MAIN CONTENT -->
-  <div id="mainContent">
-    <nav>
-      <a href="index.html">Dashboard</a>
-      <a href="risk-management.html">Risk Management</a>
-      <a href="maintenance.html">Money Management</a>
-    </nav>
-
-    <h1>Risk Management - XAUUSD</h1>
-    <label for="balance">Saldo ($):</label>
-    <input type="number" id="balance" value="1000" />
-    <button onclick="calculateLayers()">Hitung Layer</button>
-
-    <div id="output"></div>
-
-    <h3>Risk Persentase</h3>
-    <div id="riskBarContainer">
-      <div id="riskBar"></div>
+  <div id="dashboard">
+    <h2>Welcome, <span id="usernameDisplay"></span>!</h2>
+    <div class="stats">
+      <div class="stat-box">Saldo Awal Hari Ini: $<span id="initialBalanceDisplay"></span></div>
+      <div class="stat-box">Saldo Akhir: $<span id="finalBalanceDisplay"></span></div>
+      <div class="stat-box">Total Pips: <span id="totalPipsDisplay"></span></div>
+      <div class="stat-box">Total Trade: <span id="totalTradesDisplay"></span></div>
+      <div class="stat-box">Winrate: <span id="winrateDisplay"></span></div>
     </div>
-    <p id="riskLabel">Risk: 0%</p>
 
-    <h3>Tabel Layering</h3>
-    <table id="layersTable">
+    <div id="analysis">Analisa Trading Harian: <span id="analysisText">-</span></div>
+
+    <!-- Tambah Posisi -->
+    <form id="openTradeForm">
+      <h3>Tambah Posisi Terbuka</h3>
+      <select id="pair" required>
+        <option value="" disabled selected>Pilih Pair</option>
+        <option value="XAUUSD">XAUUSD</option>
+        <option value="BTCUSD">BTCUSD</option>
+      </select>
+      <input type="number" id="lot" step="0.01" min="0.01" required placeholder="Lot" />
+      <select id="position" required>
+        <option value="BUY">BUY</option>
+        <option value="SELL">SELL</option>
+      </select>
+      <input type="number" id="entryPrice" step="0.01" min="0" required placeholder="Harga Entry (2 angka koma)" />
+      <input type="text" id="reason" required placeholder="Alasan Entry" />
+      <button type="submit">Tambah</button>
+    </form>
+
+    <!-- Posisi Terbuka -->
+    <h3>Posisi Terbuka</h3>
+    <table id="openTradesTable">
       <thead>
-        <tr>
-          <th>Layer</th>
-          <th>Entry Price</th>
-          <th>Stop Loss</th>
-          <th>Take Profit</th>
-          <th>Lot</th>
-        </tr>
+        <tr><th>Pair</th><th>Lot</th><th>Posisi</th><th>Harga Entry</th><th>Alasan</th><th>Waktu Entry</th><th>Aksi</th></tr>
       </thead>
-      <tbody id="tableBody"></tbody>
+      <tbody id="openTradesBody"></tbody>
     </table>
 
-    <h3>Tabel Maksimum Lot Size (Floating Max 100 pips)</h3>
-    <table id="lotTable">
+    <!-- Riwayat Trading -->
+    <h3>Riwayat Trading</h3>
+    <table id="tradeHistory">
       <thead>
-        <tr><th>Saldo</th><th>Max Floating (100 pips)</th><th>Total Lot Max</th></tr>
+        <tr><th>Pair</th><th>Lot</th><th>Posisi</th><th>Harga Entry</th><th>Harga Tutup</th><th>Pips</th><th>Profit (USDc)</th><th>Waktu Entry</th><th>Waktu Tutup</th></tr>
       </thead>
-      <tbody id="lotTableBody"></tbody>
+      <tbody></tbody>
     </table>
 
-    <h3>Estimasi Recovery Profit Saat Layer 5 Running</h3>
-    <table id="recoveryTable">
+    <!-- Rekap Harian -->
+    <h3>Rekap Trading Harian</h3>
+    <table id="dailySummaryTable">
       <thead>
-        <tr>
-          <th>Layer</th>
-          <th>Harga Entry</th>
-          <th>Harga Sekarang</th>
-          <th>Status</th>
-          <th>Selisih Pips</th>
-          <th>Profit/Loss ($)</th>
-        </tr>
+        <tr><th>Tanggal</th><th>Saldo Awal</th><th>Saldo Akhir</th><th>Pertumbuhan (%)</th><th>Total Trade</th><th>Analisa</th></tr>
       </thead>
-      <tbody id="recoveryBody"></tbody>
+      <tbody></tbody>
     </table>
   </div>
+</div>
 
-  <script>
-    // Sistem Akses
-    function validateAccess() {
-      const code = document.getElementById('accessCode').value.trim().toUpperCase();
-      if (code === 'VL') {
-        document.getElementById('authContainer').style.display = 'none';
-        document.getElementById('mainContent').style.display = 'block';
-        calculateLayers();
-      } else {
-        alert('Kode akses salah!');
-      }
+<script>
+// Data & Users
+const users = {
+  "4ND1": { username: "Andi", initialBalance: 100 },
+  "R1SKY": { username: "Kyy Official", initialBalance: 10 },
+  "VL": { username: "VICKY", initialBalance: 10 },
+  "DEMO": { username: "DEMO", initialBalance: 1000 }
+};
+let currentUser=null;
+let initialBalance, finalBalance, totalPips, totalTrades, winTrades, lossTrades, openTrades=[];
+
+// DOM elements
+const loginForm=document.getElementById("loginForm");
+const accessCodeInput=document.getElementById("accessCode");
+const dashboard=document.getElementById("dashboard");
+const usernameDisplay=document.getElementById("usernameDisplay");
+const initialBalanceDisplay=document.getElementById("initialBalanceDisplay");
+const finalBalanceDisplay=document.getElementById("finalBalanceDisplay");
+const totalPipsDisplay=document.getElementById("totalPipsDisplay");
+const totalTradesDisplay=document.getElementById("totalTradesDisplay");
+const winrateDisplay=document.getElementById("winrateDisplay");
+const analysisText=document.getElementById("analysisText");
+const openTradeForm=document.getElementById("openTradeForm");
+const openTradesBody=document.getElementById("openTradesBody");
+const tradeHistoryBody=document.querySelector("#tradeHistory tbody");
+const dailySummaryTableBody=document.querySelector("#dailySummaryTable tbody");
+
+// LocalStorage logic
+function saveUserData(){
+  if(!currentUser) return;
+  const data={
+    initialBalance, finalBalance, totalPips, totalTrades, winTrades, lossTrades,
+    openTrades,
+    tradeHistory: Array.from(tradeHistoryBody.children).map(tr=>{
+      const c=tr.children;
+      return {
+        pair:c[0].textContent, lot:parseFloat(c[1].textContent),
+        position:c[2].textContent, entryPrice:parseFloat(c[3].textContent),
+        closePrice:parseFloat(c[4].textContent), pips:parseFloat(c[5].textContent),
+        profit:parseFloat(c[6].textContent),
+        entryTime:c[7].textContent, closeTime:c[8].textContent
+      };
+    }),
+    dailySummary: loadDailySummary()
+  };
+  localStorage.setItem(`tradingData_${currentUser.username}`, JSON.stringify(data));
+}
+function loadUserData(){
+  if(!currentUser) return null;
+  const raw=localStorage.getItem(`tradingData_${currentUser.username}`);
+  return raw?JSON.parse(raw):null;
+}
+function loadDailySummary(){
+  if(!currentUser) return [];
+  const raw=localStorage.getItem(`dailySummary_${currentUser.username}`);
+  return raw?JSON.parse(raw):[];
+}
+function saveDailySummary(data){
+  if(!currentUser) return;
+  localStorage.setItem(`dailySummary_${currentUser.username}`, JSON.stringify(data));
+}
+
+// Utilities
+function clearTable(tbody){
+  while(tbody.firstChild) tbody.removeChild(tbody.firstChild);
+}
+function getTodayStr(){
+  const d=new Date(); return d.toISOString().slice(0,10);
+}
+function getYesterdayStr(){
+  const d=new Date(); d.setDate(d.getDate()-1);
+  return d.toISOString().slice(0,10);
+}
+function generateDailyAnalysis(totalTrade, growthPercent){
+  let r=[];
+  if(totalTrade>20) r.push("Over Trading");
+  if(growthPercent<0) r.push("Kerugian");
+  else if(growthPercent<1) r.push("Growth Lambat");
+  else if(growthPercent>5) r.push("Growth Bagus");
+  else r.push("Growth Stabil");
+  return r.join("; ");
+}
+function updateAnalysis(){
+  let analisa=[];
+  if(totalTrades>20) analisa.push("⚠️ Over Trading");
+  const growthPercent=((finalBalance-initialBalance)/initialBalance)*100;
+  if(growthPercent<0) analisa.push("📉 Kerugian hari ini");
+  else if(growthPercent<1) analisa.push("⚖️ Growth lambat (<1%)");
+  else if(growthPercent>5) analisa.push("🚀 Growth bagus (>5%)");
+  else analisa.push("📈 Growth stabil");
+  analysisText.textContent=analisa.join("; ");
+}
+function updateStats(){
+  initialBalanceDisplay.textContent=initialBalance.toFixed(2);
+  finalBalanceDisplay.textContent=finalBalance.toFixed(2);
+  totalPipsDisplay.textContent=totalPips.toFixed(2);
+  totalTradesDisplay.textContent=totalTrades;
+  const closed=winTrades+lossTrades;
+  const winrate=closed>0?(winTrades/closed)*100:0;
+  winrateDisplay.textContent=winrate.toFixed(1)+"%";
+  updateAnalysis();
+}
+
+// Rendering functions
+function addOpenTradeRow(trade){
+  const tr=document.createElement("tr");
+  tr.innerHTML=`
+    <td>${trade.pair}</td><td>${trade.lot.toFixed(2)}</td><td>${trade.position}</td>
+    <td>${trade.entryPrice.toFixed(4)}</td><td>${trade.reason}</td>
+    <td>${trade.time}</td><td><button class="close-btn">Close</button></td>`;
+  openTradesBody.appendChild(tr);
+  tr.querySelector(".close-btn").addEventListener("click",()=>closeTrade(tr));
+}
+function addTradeHistoryRow(t){
+  const tr=document.createElement("tr");
+  tr.innerHTML=`
+    <td>${t.pair}</td><td>${t.lot.toFixed(2)}</td><td>${t.position}</td>
+    <td>${t.entryPrice.toFixed(4)}</td>
+    <td>${t.closePrice.toFixed(4)}</td>
+    <td>${t.pips}</td><td>${t.profit.toFixed(2)}</td>
+    <td>${t.entryTime}</td><td>${t.closeTime}</td>`;
+  tradeHistoryBody.appendChild(tr);
+}
+function renderDailySummaryTable(arr){
+  clearTable(dailySummaryTableBody);
+  arr.forEach(d=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`
+      <td>${d.date}</td><td>${d.saldoAwal.toFixed(2)}</td>
+      <td>${d.saldoAkhir.toFixed(2)}</td><td>${d.pertumbuhan.toFixed(2)}</td>
+      <td>${d.totalTrade}</td><td>${d.analisa}</td>`;
+    dailySummaryTableBody.appendChild(tr);
+  });
+}
+
+// Close trade handler
+function closeTrade(trElement){
+  const idx=Array.from(openTradesBody.children).indexOf(trElement);
+  if(idx<0) return;
+  const trade=openTrades[idx];
+  const cprompt=prompt(`Masukkan harga tutup untuk ${trade.pair} (${trade.position}):`);
+  const closePrice=parseFloat(cprompt);
+  if(isNaN(closePrice)) return alert("Harga tutup tidak valid.");
+  const pips=(trade.position==="BUY"?closePrice-trade.entryPrice:trade.entryPrice-closePrice)*10;
+  const profit=pips*trade.lot;
+  const closeTime=new Date().toLocaleString();
+
+  finalBalance+=profit;
+  totalPips+=pips;
+  totalTrades++;
+  profit>=0?winTrades++:lossTrades++;
+
+  openTrades.splice(idx,1);
+  openTradesBody.removeChild(trElement);
+  addTradeHistoryRow({
+    pair:trade.pair, lot:trade.lot, position:trade.position,
+    entryPrice:trade.entryPrice, closePrice, pips:pips.toFixed(1),
+    profit, entryTime:trade.time, closeTime
+  });
+
+  updateStats();
+  saveUserData();
+}
+
+// Daily check and summary
+function dailyCheckAndSave(){
+  const today=getTodayStr();
+  const ds=loadDailySummary();
+  if(!ds.find(d=>d.date===today)){
+    const yesterday=getYesterdayStr();
+    if(!ds.find(d=>d.date===yesterday)&& totalTrades>0){
+      const growthPercent=((finalBalance-initialBalance)/initialBalance)*100;
+      const anal=generateDailyAnalysis(totalTrades, growthPercent);
+      ds.push({ date:yesterday, saldoAwal:initialBalance, saldoAkhir:finalBalance, pertumbuhan:growthPercent, totalTrade:totalTrades, analisa:anal });
+      saveDailySummary(ds);
     }
+    resetTradingDay(today,false);
+  }
+  renderDailySummaryTable(ds);
+}
 
-    // Hitung Layering
-    function calculateLayers() {
-      const balance = parseFloat(document.getElementById("balance").value);
-      if (balance < 50) {
-        alert("Saldo terlalu kecil. Belikan makan, rokok, atau kopi saja daripada trading dengan risiko tinggi.");
-        return;
-      }
-
-      if (balance >= 50 && balance < 100) {
-        alert("Saldo berada di atas $49 namun di bawah $100.\nTingkat risiko lebih tinggi dari batas aman.\nGunakan manajemen risiko dengan sangat hati-hati.");
-      }
-
-      const pipValuePer01Lot = 1;
-      const maxFloatingPips = 100;
-      const riskPercent = balance < 100 ? 30 : 10;
-      const maxFloatingUSD = (balance * riskPercent) / 100;
-      const totalLotMax = maxFloatingUSD / (pipValuePer01Lot * maxFloatingPips);
-      const maxLayers = Math.min(5, Math.floor(totalLotMax / 0.01));
-      const lotPerLayerRaw = totalLotMax / maxLayers;
-      const lotPerLayer = Math.max(0.01, lotPerLayerRaw);
-
-      const pipFactor = 0.10;
-      const pipDistance = 5;
-      const firstEntry = 3320.0;
-      const takeProfit = firstEntry + 40 * pipFactor;
-      const stopLossPerLayer = [30, 25, 20, 15, 10];
-      const currentPrice = 3319.50;
-
-      const tableBody = document.getElementById("tableBody");
-      const lotTableBody = document.getElementById("lotTableBody");
-      const recoveryBody = document.getElementById("recoveryBody");
-
-      tableBody.innerHTML = "";
-      lotTableBody.innerHTML = "";
-      recoveryBody.innerHTML = "";
-
-      for (let i = 0; i < maxLayers; i++) {
-        const entry = firstEntry - i * pipDistance * pipFactor;
-        const sl = entry - stopLossPerLayer[i] * pipFactor;
-
-        const priceDiff = currentPrice - entry;
-        const pipsDiff = priceDiff / pipFactor;
-        const profit = pipsDiff * lotPerLayer * pipValuePer01Lot;
-
-        tableBody.innerHTML += `<tr>
-          <td>Layer ${i + 1}</td>
-          <td>${entry.toFixed(2)}</td>
-          <td>${sl.toFixed(2)}</td>
-          <td>${takeProfit.toFixed(2)}</td>
-          <td>${lotPerLayer.toFixed(2)}</td>
-        </tr>`;
-
-        recoveryBody.innerHTML += `<tr>
-          <td>Layer ${i + 1}</td>
-          <td>${entry.toFixed(2)}</td>
-          <td>${currentPrice.toFixed(2)}</td>
-          <td>${priceDiff >= 0 ? 'Profit' : 'Floating Loss'}</td>
-          <td>${pipsDiff.toFixed(1)} pips</td>
-          <td>${profit.toFixed(2)}</td>
-        </tr>`;
-      }
-
-      updateRiskBar(balance, maxFloatingUSD);
-      lotTableBody.innerHTML = `<tr><td>$${balance.toFixed(2)}</td><td>$${maxFloatingUSD.toFixed(2)}</td><td>${totalLotMax.toFixed(2)} lot</td></tr>`;
+// Reset trading day
+function resetTradingDay(todayStr,loadExisting){
+  if(loadExisting){
+    const data=loadUserData();
+    if(data){
+      initialBalance=data.initialBalance||currentUser.initialBalance;
+      finalBalance=data.finalBalance||initialBalance;
+      totalPips=data.totalPips||0;
+      totalTrades=data.totalTrades||0;
+      winTrades=data.winTrades||0;
+      lossTrades=data.lossTrades||0;
+      openTrades=data.openTrades||[];
+      clearTable(openTradesBody);
+      openTrades.forEach(addOpenTradeRow);
+      clearTable(tradeHistoryBody);
+      (data.tradeHistory||[]).forEach(addTradeHistoryRow);
+      updateStats();
+      return;
     }
+  }
+  initialBalance=currentUser.initialBalance;
+  finalBalance=initialBalance;
+  totalPips=0; totalTrades=0; winTrades=0; lossTrades=0; openTrades=[];
+  clearTable(openTradesBody);
+  clearTable(tradeHistoryBody);
+  updateStats();
+}
 
-    function updateRiskBar(balance, riskUsed) {
-      let riskPercentage = (riskUsed / balance) * 100;
-      const bar = document.getElementById("riskBar");
-      const label = document.getElementById("riskLabel");
+// Event listeners
+loginForm.addEventListener("submit",e=>{
+  e.preventDefault();
+  const code=accessCodeInput.value.trim().toUpperCase();
+  if(users[code]){
+    currentUser=users[code];
+    usernameDisplay.textContent=currentUser.username;
+    resetTradingDay(getTodayStr(),true);
+    dashboard.style.display="block";
+    loginForm.style.display="none";
+    dailyCheckAndSave();
+  } else {
+    alert("Kode akses tidak valid!");
+    accessCodeInput.value=""; accessCodeInput.focus();
+  }
+});
 
-      bar.style.width = Math.min(riskPercentage, 100) + "%";
-      label.textContent = `Risk: ${riskPercentage.toFixed(1)}%`;
+openTradeForm.addEventListener("submit", e => {
+  e.preventDefault();
+  const pair = document.getElementById("pair").value.trim().toUpperCase();
+  const lot = parseFloat(document.getElementById("lot").value);
+  const position = document.getElementById("position").value;
 
-      if (riskPercentage <= 25) {
-        bar.style.backgroundColor = "green";
-      } else if (riskPercentage <= 50) {
-        bar.style.backgroundColor = "yellow";
-      } else {
-        bar.style.backgroundColor = "red";
-      }
-    }
+  const entryPriceRaw = document.getElementById("entryPrice").value.trim();
+  
+  // Validasi 2 angka di belakang koma
+  if (!/^\d+(\.\d{1,2})?$/.test(entryPriceRaw)) {
+    alert("Harga Entry harus maksimal 2 angka di belakang koma.");
+    return;
+  }
 
-    // Disable developer tools
-    document.addEventListener("keydown", function (e) {
-      if (
-        e.key === "F12" ||
-        (e.ctrlKey && e.shiftKey && e.key === "I") ||
-        (e.ctrlKey && e.key === "u")
-      ) {
-        e.preventDefault();
-        alert("Akses developer tools diblokir!");
-        return false;
-      }
-    });
+  const entryPrice = parseFloat(entryPriceRaw);
+  const reason = document.getElementById("reason").value.trim();
+  const entryTime = new Date().toLocaleString();
 
-    document.addEventListener("contextmenu", function (e) {
-      e.preventDefault();
-    });
+  const newTrade = { pair, lot, position, entryPrice, reason, time: entryTime };
+  openTrades.push(newTrade);
+  addOpenTradeRow(newTrade);
+  saveUserData();
+  openTradeForm.reset();
+}
 
-    // Blokir klik kanan
+                               // Blokir klik kanan
     document.addEventListener("contextmenu", function(e) {
       e.preventDefault();
     });
@@ -377,6 +451,7 @@
         e.preventDefault();
       }
     });
-  </script>
+
+</script>
 </body>
 </html>

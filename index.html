@@ -524,7 +524,7 @@
       pips = parseFloat(pips.toFixed(2));
 
       const usdPerPip = 0.1; // asumsi 1 pip = 0.1 USDc per lot (ubah sesuai kebutuhan)
-      let profit = pips * lot * usdPerPip;
+      let profit = pips * lot * 10 * usdPerPip;
       profit = parseFloat(profit.toFixed(2));
 
       // Update final balance

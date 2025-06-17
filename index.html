@@ -2,47 +2,64 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Trading Dashboard</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f0f2f5;
+      margin: 0;
+      padding: 0;
+    }
+    .access-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .access-container input {
+      padding: 10px;
+      font-size: 16px;
+      margin-top: 10px;
+      width: 200px;
+    }
+    .access-container button {
+      padding: 10px 20px;
+      margin-top: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .container {
+      display: none;
+      padding: 20px;
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
+
+  <!-- Kode Akses Form -->
+  <div class="access-container" id="accessContainer">
+    <h2>Masukkan Kode Akses</h2>
+    <input type="text" id="accessCodeInput" placeholder="Masukkan kode...">
+    <button onclick="checkAccess()">Masuk</button>
+    <p id="accessMessage" style="color:red; margin-top: 10px;"></p>
+  </div>
+
+  <!-- Konten Dashboard -->
+  <div class="container" id="dashboard">
     <h1>📈 Trading Panel</h1>
 
     <div class="stats">
-      <div class="stat-box">
-        <h3>Saldo Awal</h3>
-        <span id="initialBalance">1250.00 USDc</span>
-      </div>
-      <div class="stat-box">
-        <h3>Saldo Akhir</h3>
-        <span id="finalBalance">1250.00 USDc</span>
-      </div>
-      <div class="stat-box">
-        <h3>Total Pips</h3>
-        <span id="totalPips">0</span>
-      </div>
-      <div class="stat-box">
-        <h3>Total USDc</h3>
-        <span id="totalUSDC">0</span>
-      </div>
-      <div class="stat-box">
-        <h3>Total Trade</h3>
-        <span id="totalTrades">0</span>
-      </div>
-      <div class="stat-box">
-        <h3>Win Trade ✅</h3>
-        <span id="winTrades">0</span>
-      </div>
-      <div class="stat-box">
-        <h3>Loss Trade ❌</h3>
-        <span id="lossTrades">0</span>
-      </div>
-      <div class="stat-box">
-        <h3>Winrate 🏆</h3>
-        <span id="winrate">0%</span>
-      </div>
+      <div class="stat-box"><h3>Saldo Awal</h3><span id="initialBalance">1250.00 USDc</span></div>
+      <div class="stat-box"><h3>Saldo Akhir</h3><span id="finalBalance">1250.00 USDc</span></div>
+      <div class="stat-box"><h3>Total Pips</h3><span id="totalPips">0</span></div>
+      <div class="stat-box"><h3>Total USDc</h3><span id="totalUSDC">0</span></div>
+      <div class="stat-box"><h3>Total Trade</h3><span id="totalTrades">0</span></div>
+      <div class="stat-box"><h3>Win Trade ✅</h3><span id="winTrades">0</span></div>
+      <div class="stat-box"><h3>Loss Trade ❌</h3><span id="lossTrades">0</span></div>
+      <div class="stat-box"><h3>Winrate 🏆</h3><span id="winrate">0%</span></div>
     </div>
 
     <form id="tradeForm">
@@ -119,6 +136,20 @@
     </div>
   </div>
 
+  <script>
+    function checkAccess() {
+      const input = document.getElementById('accessCodeInput').value.trim().toUpperCase();
+      const allowedCode = "VL";
+      const message = document.getElementById('accessMessage');
+
+      if (input === allowedCode) {
+        document.getElementById('accessContainer').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+      } else {
+        message.textContent = "Kode akses salah!";
+      }
+    }
+  </script>
   <script src="script.js"></script>
 </body>
 </html>

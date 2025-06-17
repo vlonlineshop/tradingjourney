@@ -1,232 +1,244 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Risk-Based Layer Simulator Final</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Risk Management - XAUUSD</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
-      color: #f0f0f0;
+      background-color: #0a0a0a;
+      color: #0ff;
       padding: 20px;
       line-height: 1.6;
     }
-    input, button {
-      padding: 10px;
+    h1, h3 {
+      color: #00f7ff;
+      border-bottom: 2px solid #0ff5;
+      padding-bottom: 5px;
+    }
+    label, input, button {
       font-size: 16px;
-      margin: 10px 0;
-      border: none;
-      border-radius: 5px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     }
     input {
-      width: 100%;
+      padding: 8px;
+      margin: 10px 5px;
+      width: 150px;
+      border: 1px solid #0ff;
+      background-color: #111;
+      color: #0ff;
+      border-radius: 4px;
     }
     button {
-      background-color: #00b894;
-      color: white;
+      padding: 8px 16px;
+      background-color: #00aaff;
+      border: none;
+      color: #fff;
+      border-radius: 4px;
       cursor: pointer;
-      transition: background-color 0.3s;
+      box-shadow: 0 0 10px #00aaff88;
     }
     button:hover {
-      background-color: #019875;
+      background-color: #0088cc;
     }
-    .risk-bar {
-      width: 100%;
-      height: 20px;
-      background: #555;
-      border-radius: 10px;
-      overflow: hidden;
-      margin: 20px 0;
-    }
-    .risk-fill {
-      height: 100%;
-      width: 0;
-      background: green;
-      transition: width 0.3s ease-in-out;
-    }
-    .layer {
-      margin: 5px 0;
+    nav {
+      background: #011;
       padding: 10px;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 5px;
-    }
-    .profit { color: #00ff9d; }
-    .loss { color: #ff6b6b; }
-    .floating { color: #ffe66d; }
-    h1, h2, h3 {
-      color: #ffffff;
-    }
-    canvas {
-      background: #1e272e;
-      border: 1px solid #3742fa;
+      margin-bottom: 20px;
       border-radius: 8px;
-      display: block;
-      margin: 20px 0;
+      box-shadow: 0 0 10px #0ff5;
     }
-    #info p, #simulation p, #simulation h3 {
-      margin: 5px 0;
+    nav a {
+      color: #0ff;
+      text-decoration: none;
+      margin: 0 15px;
+      font-weight: bold;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+    table {
+      margin-top: 20px;
+      width: 100%;
+      border-collapse: collapse;
+      box-shadow: 0 0 10px #0ff3;
+    }
+    th, td {
+      border: 1px solid #0ff;
+      padding: 10px;
+      text-align: center;
+      background-color: #111;
+    }
+    th {
+      background-color: #033;
+      color: #0ff;
+    }
+    #riskBarContainer {
+      width: 100%;
+      height: 30px;
+      background: #022;
+      border-radius: 6px;
+      margin-top: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 10px #0ff5;
+    }
+    #riskBar {
+      height: 100%;
+      width: 0%;
+      background-color: green;
+      transition: width 0.5s ease, background-color 0.5s ease;
+      border-radius: 6px;
+    }
+    #riskLabel {
+      color: #0ff;
+      margin-top: 5px;
+      font-weight: bold;
+      font-size: 18px;
     }
   </style>
 </head>
 <body>
+  <nav>
+    <a href="index.html">Dashboard</a>
+    <a href="risk-management.html">Risk Management</a>
+    <a href="maintenance.html">Money Management</a>
+  </nav>
 
-<h1>Simulasi Risk Management</h1>
+  <h1>Risk Management - XAUUSD</h1>
+  <label for="balance">Saldo ($):</label>
+  <input type="number" id="balance" value="1000" />
+  <button onclick="calculateLayers()">Hitung Layer</button>
 
-<label>Saldo ($):</label><br>
-<input type="number" id="saldoInput" value="1000"><br>
+  <div id="output"></div>
 
-<label>Harga Awal:</label><br>
-<input type="number" id="startPriceInput" value="3320.00" step="0.01"><br>
+  <h3>Risk Persentase</h3>
+  <div id="riskBarContainer">
+    <div id="riskBar"></div>
+  </div>
+  <p id="riskLabel">Risk: 0%</p>
 
-<button onclick="startSimulation()">Mulai Simulasi</button>
+  <h3>Tabel Layering</h3>
+  <table id="layersTable">
+    <thead>
+      <tr>
+        <th>Layer</th>
+        <th>Entry Price</th>
+        <th>Stop Loss</th>
+        <th>Take Profit</th>
+        <th>Lot</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
 
-<div id="info"></div>
-<div class="risk-bar"><div id="risk-fill" class="risk-fill"></div></div>
-<div id="simulation"></div>
-<canvas id="priceChart" width="600" height="200"></canvas>
+  <h3>Tabel Maksimum Lot Size (Floating Max 100 pips)</h3>
+  <table id="lotTable">
+    <thead>
+      <tr><th>Saldo</th><th>Max Floating (100 pips)</th><th>Total Lot Max</th></tr>
+    </thead>
+    <tbody id="lotTableBody"></tbody>
+  </table>
 
-<script>
-function generatePricePath(start) {
-  const steps = 100;
-  const path = [];
-  let current = start;
-  for (let i = 0; i < steps; i++) {
-    if (i < 10) {
-      current -= 0.1;
-    } else {
-      const rand = Math.random();
-      current += rand < 0.7 ? 0.1 : -0.05;
-    }
-    path.push(parseFloat(current.toFixed(2)));
-  }
-  return path;
-}
+  <h3>Estimasi Recovery Profit Saat Layer 5 Running</h3>
+  <table id="recoveryTable">
+    <thead>
+      <tr>
+        <th>Layer</th>
+        <th>Harga Entry</th>
+        <th>Harga Sekarang</th>
+        <th>Status</th>
+        <th>Selisih Pips</th>
+        <th>Profit/Loss ($)</th>
+      </tr>
+    </thead>
+    <tbody id="recoveryBody"></tbody>
+  </table>
 
-function startSimulation() {
-  const saldo = parseFloat(document.getElementById("saldoInput").value);
-  const startPrice = parseFloat(document.getElementById("startPriceInput").value);
-  const risk = saldo * 0.10;
-  const pipStep = 0.50;
-  const pipValuePer01Lot = 0.10;
-  const maxLayers = 5;
-  const multiplier = 1.05;
-
-  const maxLotBySaldo = saldo * 0.05;
-
-  const baseLot = Math.min(calculateBaseLot(risk, pipStep, pipValuePer01Lot, maxLayers, multiplier), maxLotBySaldo);
-
-  const layers = [];
-  let lot = baseLot;
-  for (let i = 0; i < maxLayers; i++) {
-    lot = Math.floor(Math.max(0.01, lot) * 100) / 100;
-    const entry = parseFloat((startPrice - pipStep * (i + 1)).toFixed(2));
-    layers.push({ layer: i + 1, entry, lot, active: false, pips: 0, usd: 0 });
-    lot *= 1.05;
-  }
-
-  document.getElementById("info").innerHTML = `
-    <p><strong>Saldo:</strong> $${saldo}</p>
-    <p><strong>Max Risk (10%):</strong> $${risk.toFixed(2)}</p>
-    <p><strong>Lot Layer 1:</strong> ${baseLot.toFixed(2)} lot</p>
-  `;
-
-  const prices = generatePricePath(startPrice);
-  const simulationDiv = document.getElementById("simulation");
-  const riskFill = document.getElementById("risk-fill");
-  const ctx = document.getElementById("priceChart").getContext("2d");
-
-  let i = 0;
-  const pricePoints = [];
-
-  const interval = setInterval(() => {
-    const price = prices[i];
-    if (!price) {
-      clearInterval(interval);
-      return;
-    }
-
-    simulationDiv.innerHTML = `<h2>Harga Saat Ini: ${price.toFixed(2)}</h2>`;
-    let totalFloat = 0;
-
-    layers.forEach(layer => {
-      if (!layer.active && price <= layer.entry) {
-        layer.active = true;
+  <script>
+    function calculateLayers() {
+      const balance = parseFloat(document.getElementById("balance").value);
+      if (balance < 50) {
+        alert("Saldo terlalu kecil. Belikan makan, rokok, atau kopi saja daripada trading dengan risiko tinggi.");
+        return;
       }
 
-      if (layer.active) {
-        const pips = (price - layer.entry) * 10;
-        const valuePerPip = (layer.lot / 0.01) * pipValuePer01Lot;
-        const usd = pips * valuePerPip;
-        layer.pips = pips;
-        layer.usd = usd;
-        totalFloat += usd;
-
-        const cls = usd > 0 ? 'profit' : usd < 0 ? 'floating' : 'loss';
-        simulationDiv.innerHTML += `
-          <div class="layer ${cls}">
-            Layer ${layer.layer}: Entry ${layer.entry.toFixed(2)} | Lot ${layer.lot.toFixed(2)} lot → 
-            ${pips.toFixed(1)} pips | $${usd.toFixed(2)}
-          </div>`;
+      if (balance >= 50 && balance < 100) {
+        alert("Saldo berada di atas $49 namun di bawah $100.\nTingkat risiko lebih tinggi dari batas aman.\nGunakan manajemen risiko dengan sangat hati-hati.");
       }
-    });
 
-    simulationDiv.innerHTML += `<h3>Total Floating: $${totalFloat.toFixed(2)}</h3>`;
+      const pipValuePer01Lot = 1;
+      const maxFloatingPips = 100;
+      const riskPercent = balance < 100 ? 30 : 10;
+      const maxFloatingUSD = (balance * riskPercent) / 100;
+      const totalLotMax = maxFloatingUSD / (pipValuePer01Lot * maxFloatingPips);
+      const maxLayers = Math.min(5, Math.floor(totalLotMax / 0.01));
+      const lotPerLayerRaw = totalLotMax / maxLayers;
+      const lotPerLayer = Math.max(0.01, lotPerLayerRaw);
 
-    const usage = Math.min(Math.abs(totalFloat) / risk, 1);
-    riskFill.style.width = `${usage * 100}%`;
-    riskFill.style.background = usage < 0.5 ? 'green' : usage < 0.8 ? 'yellow' : 'red';
+      const pipFactor = 0.10;
+      const pipDistance = 5;
+      const firstEntry = 3320.0;
+      const takeProfit = firstEntry + 40 * pipFactor;
+      const stopLossPerLayer = [30, 25, 20, 15, 10];
 
-    pricePoints.push(price);
-    drawChart(ctx, pricePoints);
+      const currentPrice = 3319.50;
 
-    i++;
-  }, 300);
-}
+      const tableBody = document.getElementById("tableBody");
+      const lotTableBody = document.getElementById("lotTableBody");
+      const recoveryBody = document.getElementById("recoveryBody");
 
-function calculateBaseLot(maxLoss, pipStep, pipValuePer01Lot, layerCount, multiplier) {
-  const safetyFactor = 0.9;
-  let bestLot = 0.01;
+      tableBody.innerHTML = "";
+      lotTableBody.innerHTML = "";
+      recoveryBody.innerHTML = "";
 
-  for (let lot = 0.01; lot <= 10; lot += 0.01) {
-    lot = Math.floor(lot * 100) / 100;
-    let totalLoss = 0;
-    let currentLot = lot;
+      for (let i = 0; i < maxLayers; i++) {
+        const entry = firstEntry - i * pipDistance * pipFactor;
+        const sl = entry - stopLossPerLayer[i] * pipFactor;
 
-    for (let i = 0; i < layerCount; i++) {
-      const pips = pipStep * (i + 1);
-      const valuePerPip = (currentLot / 0.01) * pipValuePer01Lot;
-      const loss = pips * valuePerPip;
-      totalLoss += loss;
-      currentLot *= multiplier;
+        const priceDiff = currentPrice - entry;
+        const pipsDiff = priceDiff / pipFactor;
+        const profit = pipsDiff * lotPerLayer * pipValuePer01Lot;
+
+        tableBody.innerHTML += `<tr>
+          <td>Layer ${i + 1}</td>
+          <td>${entry.toFixed(2)}</td>
+          <td>${sl.toFixed(2)}</td>
+          <td>${takeProfit.toFixed(2)}</td>
+          <td>${lotPerLayer.toFixed(2)}</td>
+        </tr>`;
+
+        recoveryBody.innerHTML += `<tr>
+          <td>Layer ${i + 1}</td>
+          <td>${entry.toFixed(2)}</td>
+          <td>${currentPrice.toFixed(2)}</td>
+          <td>${priceDiff >= 0 ? 'Profit' : 'Floating Loss'}</td>
+          <td>${pipsDiff.toFixed(1)} pips</td>
+          <td>${profit.toFixed(2)}</td>
+        </tr>`;
+      }
+
+      updateRiskBar(balance, maxFloatingUSD);
+      lotTableBody.innerHTML = `<tr><td>$${balance.toFixed(2)}</td><td>$${maxFloatingUSD.toFixed(2)}</td><td>${totalLotMax.toFixed(2)} lot</td></tr>`;
     }
 
-    if (totalLoss > maxLoss * safetyFactor) {
-      break;
+    function updateRiskBar(balance, riskUsed) {
+      let riskPercentage = (riskUsed / balance) * 100;
+      const bar = document.getElementById("riskBar");
+      const label = document.getElementById("riskLabel");
+
+      bar.style.width = Math.min(riskPercentage, 100) + "%";
+      label.textContent = `Risk: ${riskPercentage.toFixed(1)}%`;
+
+      if (riskPercentage <= 25) {
+        bar.style.backgroundColor = "green";
+      } else if (riskPercentage <= 50) {
+        bar.style.backgroundColor = "yellow";
+      } else {
+        bar.style.backgroundColor = "red";
+      }
     }
 
-    bestLot = lot;
-  }
-
-  return bestLot;
-}
-
-function drawChart(ctx, data) {
-  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-  ctx.beginPath();
-  ctx.strokeStyle = '#00cec9';
-  ctx.lineWidth = 2;
-  const step = ctx.canvas.width / (data.length - 1);
-  data.forEach((val, i) => {
-    const x = i * step;
-    const y = ctx.canvas.height - ((val - Math.min(...data)) / (Math.max(...data) - Math.min(...data))) * ctx.canvas.height;
-    if (i === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  });
-  ctx.stroke();
-}
-</script>
-
+    calculateLayers();
+  </script>
 </body>
 </html>

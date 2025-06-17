@@ -101,8 +101,8 @@
   <div id="dashboard">
     <h2>Welcome, <span id="usernameDisplay"></span>!</h2>
     <div class="stats">
-      <div class="stat-box">Saldo Awal Hari Ini: <span id="initialBalanceDisplay"></span> USDc</div>
-      <div class="stat-box">Saldo Akhir: <span id="finalBalanceDisplay"></span> USDc</div>
+      <div class="stat-box">Saldo Awal Hari Ini: $<span id="initialBalanceDisplay"></span></div>
+      <div class="stat-box">Saldo Akhir: $<span id="finalBalanceDisplay"></span></div>
       <div class="stat-box">Total Pips: <span id="totalPipsDisplay"></span></div>
       <div class="stat-box">Total Trade: <span id="totalTradesDisplay"></span></div>
       <div class="stat-box">Winrate: <span id="winrateDisplay"></span></div>
@@ -112,7 +112,12 @@
 
     <form id="openTradeForm">
       <h3>Tambah Posisi Terbuka</h3>
-      <input type="text" id="pair" required placeholder="Pair (Contoh: EURUSD)" />
+      <select id="pair" required>
+  <option value="" disabled selected>Pilih Pair</option>
+  <option value="XAUUSD">XAUUSD</option>
+  <option value="BTCUSD">BTCUSD</option>
+</select>
+
       <input type="number" id="lot" step="0.01" min="0.01" required placeholder="Lot" />
       <select id="position" required>
         <option value="BUY">BUY</option>

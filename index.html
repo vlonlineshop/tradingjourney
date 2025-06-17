@@ -302,7 +302,7 @@ function closeTrade(trElement){
   const cprompt=prompt(`Masukkan harga tutup untuk ${trade.pair} (${trade.position}):`);
   const closePrice=parseFloat(cprompt);
   if(isNaN(closePrice)) return alert("Harga tutup tidak valid.");
-  const pips=(trade.position==="BUY"?closePrice-trade.entryPrice:trade.entryPrice-closePrice)*100;
+  const pips=(trade.position==="BUY"?closePrice-trade.entryPrice:trade.entryPrice-closePrice)*10;
   const profit=pips*trade.lot;
   const closeTime=new Date().toLocaleString();
 

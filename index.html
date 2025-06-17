@@ -1,171 +1,107 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Trading Journey</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trading Dashboard</title>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f4f8;
       margin: 0;
       padding: 0;
-      color: #fff;
     }
-
-    /* KODE AKSES */
-    .access-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      animation: fadeIn 1.5s ease-out;
-    }
-
-    .access-container h2 {
-      font-size: 28px;
-      margin-bottom: 20px;
-    }
-
-    .access-container input {
-      padding: 12px 16px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: 2px solid transparent;
-      outline: none;
-      transition: all 0.3s ease;
-      width: 250px;
-      background: #ffffff;
-      color: #333;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    }
-
-    .access-container input:focus {
-      border-color: #00c6ff;
-      box-shadow: 0 0 10px #00c6ff88;
-    }
-
-    .access-container button {
-      margin-top: 15px;
-      padding: 12px 20px;
-      width: 250px;
-      font-size: 16px;
-      background: linear-gradient(to right, #00c6ff, #0072ff);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    }
-
-    .access-container button:hover {
-      box-shadow: 0 0 15px #00c6ffcc;
-      transform: scale(1.03);
-    }
-
-    #accessMessage {
-      color: #ff7070;
-      margin-top: 10px;
-      font-weight: bold;
-      animation: shake 0.3s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes shake {
-      0% { transform: translateX(0); }
-      25% { transform: translateX(-4px); }
-      50% { transform: translateX(4px); }
-      75% { transform: translateX(-2px); }
-      100% { transform: translateX(0); }
-    }
-
-    /* DASHBOARD */
     .container {
-      display: none;
+      max-width: 1000px;
+      margin: auto;
       padding: 20px;
     }
-
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
     .stats {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 15px;
       margin-bottom: 20px;
     }
-
     .stat-box {
-      background: white;
-      color: #333;
-      padding: 10px;
+      flex: 1 1 200px;
+      background: #fff;
+      padding: 15px;
       border-radius: 8px;
-      flex: 1;
-      min-width: 150px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-
     form {
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
       margin-bottom: 20px;
     }
-
     form input, form select, form button {
       margin: 5px;
       padding: 8px;
-      font-size: 14px;
     }
-
+    .table-wrapper {
+      margin-bottom: 30px;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 30px;
-      background: white;
-      color: #000;
     }
-
-    th, td {
-      padding: 10px;
+    table, th, td {
       border: 1px solid #ddd;
+    }
+    th, td {
+      padding: 8px;
       text-align: center;
     }
-
     .chart-container iframe {
       width: 100%;
       height: 300px;
       border: none;
     }
-
-    button.close-btn {
-      padding: 6px 10px;
-      background-color: crimson;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
+    #accessContainer {
+      text-align: center;
+      margin-top: 100px;
     }
-
-    button.close-btn:hover {
-      background-color: darkred;
+    #accessContainer input {
+      padding: 10px;
+      font-size: 18px;
+      border: 2px solid #007bff;
+      border-radius: 5px;
+      transition: 0.3s;
+    }
+    #accessContainer input:focus {
+      outline: none;
+      box-shadow: 0 0 5px #007bff;
+    }
+    #accessMessage {
+      color: red;
+      margin-top: 10px;
+      display: none;
+    }
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+      100% { transform: translateX(0); }
     }
   </style>
 </head>
 <body>
-
-  <!-- FORM AKSES -->
-  <div class="access-container" id="accessContainer">
-    <h2>Masukkan Kode Akses</h2>
-    <input type="text" id="accessCodeInput" placeholder="Kode akses...">
+  <div id="accessContainer">
+    <h2>🔒 Masukkan Kode Akses</h2>
+    <input type="text" id="accessCodeInput" placeholder="Kode Akses (contoh: VL)" />
     <button onclick="checkAccess()">Masuk</button>
-    <p id="accessMessage" style="display:none;"></p>
+    <div id="accessMessage"></div>
   </div>
 
-  <!-- DASHBOARD -->
-  <div class="container" id="dashboard">
+  <div id="dashboard" class="container" style="display:none">
     <h1>📈 Trading Panel</h1>
-
     <div class="stats">
       <div class="stat-box"><h3>Saldo Awal</h3><span id="initialBalance">1250.00 USDc</span></div>
       <div class="stat-box"><h3>Saldo Akhir</h3><span id="finalBalance">1250.00 USDc</span></div>
@@ -178,35 +114,27 @@
     </div>
 
     <form id="tradeForm">
-      <select id="pair">
-        <option value="XAUUSDc">XAUUSDc</option>
-        <option value="BTCUSDc">BTCUSDc</option>
-      </select>
+      <select id="pair"><option value="XAUUSDc">XAUUSDc</option><option value="BTCUSDc">BTCUSDc</option></select>
       <input type="number" step="0.01" id="lot" placeholder="Lot (e.g. 0.01)" required />
-      <select id="position">
-        <option value="BUY">BUY</option>
-        <option value="SELL">SELL</option>
-      </select>
+      <select id="position"><option value="BUY">BUY</option><option value="SELL">SELL</option></select>
       <input type="text" id="reason" placeholder="Alasan Entry" required />
-      <input type="number" step="0.01" id="entryPrice" placeholder="Harga Entry" required />
+      <input type="number" step="0.01" id="entryPrice" placeholder="Harga Entry (xxxx.xx)" required />
       <button type="submit">Tambah Posisi</button>
     </form>
 
     <div class="table-wrapper">
       <h2>📌 Posisi Terbuka</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Pair</th>
-            <th>Lot</th>
-            <th>Posisi</th>
-            <th>Entry</th>
-            <th>Alasan</th>
-            <th>Waktu</th>
-            <th>Action</th>
-          </tr>
-        </thead>
+      <table id="openTradesTable">
+        <thead><tr><th>Pair</th><th>Lot</th><th>Posisi</th><th>Entry</th><th>Alasan</th><th>Waktu</th><th>Action</th></tr></thead>
         <tbody id="openTradesBody"></tbody>
+      </table>
+    </div>
+
+    <div class="table-wrapper">
+      <h2>✅ History Trading</h2>
+      <table id="tradeHistory">
+        <thead><tr><th>Pair</th><th>Lot</th><th>Posisi</th><th>Entry</th><th>Close</th><th>Pips</th><th>USDC</th><th>Waktu Entry</th><th>Waktu Close</th></tr></thead>
+        <tbody></tbody>
       </table>
     </div>
 
@@ -217,7 +145,13 @@
   </div>
 
   <script>
-    // Validasi akses
+    let initialBalance = 1250.00;
+    let finalBalance = 1250.00;
+    let winTrades = 0;
+    let lossTrades = 0;
+    let totalPips = 0;
+    let totalTrades = 0;
+
     function checkAccess() {
       const input = document.getElementById('accessCodeInput').value.trim().toUpperCase();
       const msg = document.getElementById('accessMessage');
@@ -232,30 +166,73 @@
       }
     }
 
-    // Tambah trade
     document.getElementById("tradeForm").addEventListener("submit", function(e) {
       e.preventDefault();
       const pair = document.getElementById("pair").value;
-      const lot = parseFloat(document.getElementById("lot").value).toFixed(2);
+      const lot = parseFloat(document.getElementById("lot").value);
       const position = document.getElementById("position").value;
       const reason = document.getElementById("reason").value;
-      const entryPrice = parseFloat(document.getElementById("entryPrice").value).toFixed(2);
+      const entryPrice = parseFloat(document.getElementById("entryPrice").value);
       const time = new Date().toLocaleString();
 
       const row = document.createElement("tr");
       row.innerHTML = `
         <td>${pair}</td>
-        <td>${lot}</td>
+        <td>${lot.toFixed(2)}</td>
         <td>${position}</td>
-        <td>${entryPrice}</td>
+        <td>${entryPrice.toFixed(2)}</td>
         <td>${reason}</td>
         <td>${time}</td>
-        <td><button class="close-btn" onclick="this.closest('tr').remove()">Tutup</button></td>
+        <td><button class="close-btn">Tutup</button></td>
       `;
+      row.querySelector("button").addEventListener("click", function() {
+        const closePrice = prompt("Masukkan harga close:");
+        if (closePrice === null) return;
+        const close = parseFloat(closePrice);
+        if (isNaN(close)) return alert("Harga tidak valid!");
+
+        const pips = (position === "BUY") ? (close - entryPrice) * 100 : (entryPrice - close) * 100;
+        const usdc = pips * lot;
+
+        totalTrades++;
+        totalPips += pips;
+        finalBalance += usdc;
+
+        if (usdc >= 0) winTrades++;
+        else lossTrades++;
+
+        updateStats();
+
+        const historyRow = document.createElement("tr");
+        historyRow.innerHTML = `
+          <td>${pair}</td>
+          <td>${lot.toFixed(2)}</td>
+          <td>${position}</td>
+          <td>${entryPrice.toFixed(2)}</td>
+          <td>${close.toFixed(2)}</td>
+          <td>${pips.toFixed(1)}</td>
+          <td>${usdc.toFixed(2)}</td>
+          <td>${time}</td>
+          <td>${new Date().toLocaleString()}</td>
+        `;
+        document.querySelector("#tradeHistory tbody").appendChild(historyRow);
+        row.remove();
+      });
       document.getElementById("openTradesBody").appendChild(row);
       this.reset();
     });
-  </script>
 
+    function updateStats() {
+      document.getElementById("initialBalance").textContent = initialBalance.toFixed(2) + " USDc";
+      document.getElementById("finalBalance").textContent = finalBalance.toFixed(2) + " USDc";
+      document.getElementById("totalTrades").textContent = totalTrades;
+      document.getElementById("winTrades").textContent = winTrades;
+      document.getElementById("lossTrades").textContent = lossTrades;
+      document.getElementById("totalPips").textContent = totalPips.toFixed(1);
+      document.getElementById("totalUSDC").textContent = (finalBalance - initialBalance).toFixed(2);
+      const winrate = totalTrades > 0 ? (winTrades / totalTrades) * 100 : 0;
+      document.getElementById("winrate").textContent = winrate.toFixed(1) + "%";
+    }
+  </script>
 </body>
 </html>

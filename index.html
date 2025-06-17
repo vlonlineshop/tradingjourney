@@ -87,10 +87,31 @@
     min-height: 50px;
     font-weight: bold;
   }
+  nav {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+  }
+  nav a {
+    color: #0ff;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s;
+  }
+  nav a:hover {
+    color: #fff;
+  }
 </style>
 </head>
 <body>
 <div class="container">
+  <nav>
+    <a href="index.html">Dashboard</a>
+    <a href="risk-management.html">Risk Management</a>
+    <a href="maintenance.html">Money Management</a>
+  </nav>
+
   <h1>Login Trading Journey</h1>
   <form id="loginForm">
     <label for="accessCode">Masukkan Kode Akses: </label>
@@ -110,29 +131,25 @@
 
     <div id="analysis">Analisa Trading Harian: <span id="analysisText">-</span></div>
 
-    <!-- Tambahkan ini di dalam form openTradeForm -->
-<form id="openTradeForm">
-  <h3>Tambah Posisi Terbuka</h3>
-  <select id="pair" required>
-    <option value="" disabled selected>Pilih Pair</option>
-    <option value="XAUUSD">XAUUSD</option>
-    <option value="BTCUSD">BTCUSD</option>
-  </select>
+    <!-- Tambah Posisi -->
+    <form id="openTradeForm">
+      <h3>Tambah Posisi Terbuka</h3>
+      <select id="pair" required>
+        <option value="" disabled selected>Pilih Pair</option>
+        <option value="XAUUSD">XAUUSD</option>
+        <option value="BTCUSD">BTCUSD</option>
+      </select>
+      <input type="number" id="lot" step="0.01" min="0.01" required placeholder="Lot" />
+      <select id="position" required>
+        <option value="BUY">BUY</option>
+        <option value="SELL">SELL</option>
+      </select>
+      <input type="number" id="entryPrice" step="0.01" min="0" required placeholder="Harga Entry (2 angka koma)" />
+      <input type="text" id="reason" required placeholder="Alasan Entry" />
+      <button type="submit">Tambah</button>
+    </form>
 
-  <input type="number" id="lot" step="0.01" min="0.01" required placeholder="Lot" />
-  
-  <select id="position" required>
-    <option value="BUY">BUY</option>
-    <option value="SELL">SELL</option>
-  </select>
-
-  <!-- Step disesuaikan ke 0.01 -->
-  <input type="number" id="entryPrice" step="0.01" min="0" required placeholder="Harga Entry (2 angka koma)" />
-
-  <input type="text" id="reason" required placeholder="Alasan Entry" />
-  <button type="submit">Tambah</button>
-</form>
-
+    <!-- Posisi Terbuka -->
     <h3>Posisi Terbuka</h3>
     <table id="openTradesTable">
       <thead>
@@ -141,6 +158,7 @@
       <tbody id="openTradesBody"></tbody>
     </table>
 
+    <!-- Riwayat Trading -->
     <h3>Riwayat Trading</h3>
     <table id="tradeHistory">
       <thead>
@@ -149,6 +167,7 @@
       <tbody></tbody>
     </table>
 
+    <!-- Rekap Harian -->
     <h3>Rekap Trading Harian</h3>
     <table id="dailySummaryTable">
       <thead>

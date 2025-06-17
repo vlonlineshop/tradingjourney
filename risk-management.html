@@ -2,24 +2,104 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Risk Management - XAUUSD</title>
   <style>
     body {
+      margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #0a0a0a;
+      background-color: #000;
       color: #0ff;
-      padding: 20px;
-      line-height: 1.6;
     }
+
+    /* Neon Login Container */
+    #authContainer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: radial-gradient(circle at center, #001e2f 0%, #000 100%);
+      animation: pulseGlow 5s infinite alternate;
+      box-shadow: inset 0 0 50px #00f2ff33;
+      border-radius: 12px;
+      padding: 40px;
+      text-align: center;
+    }
+
+    #authContainer h1 {
+      font-size: 2.5rem;
+      text-shadow: 0 0 10px #0ff, 0 0 20px #0ff2;
+    }
+
+    #authContainer p {
+      font-size: 1.2rem;
+      color: #88f;
+      text-shadow: 0 0 5px #0ff2;
+    }
+
+    #accessCode {
+      padding: 12px;
+      font-size: 1.1rem;
+      width: 240px;
+      border: none;
+      border-radius: 8px;
+      background: #020b14;
+      color: #0ff;
+      outline: none;
+      box-shadow: 0 0 10px #00f2ff88;
+    }
+
+    #accessCode:focus {
+      box-shadow: 0 0 20px #00f2ffcc;
+    }
+
+    #authContainer button {
+      margin-top: 20px;
+      padding: 10px 24px;
+      background: #00aaff;
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 1.1rem;
+      cursor: pointer;
+      box-shadow: 0 0 10px #00f2ffaa;
+      transition: background 0.3s ease, transform 0.3s ease;
+    }
+
+    #authContainer button:hover {
+      background: #008ecc;
+      transform: scale(1.05);
+      box-shadow: 0 0 20px #00f2ffff;
+    }
+
+    @keyframes pulseGlow {
+      0% { box-shadow: inset 0 0 30px #00f2ff33; }
+      100% { box-shadow: inset 0 0 60px #00f2ff99; }
+    }
+
+    /* Risk Management Content (Hidden by default) */
+    #mainContent {
+      display: none;
+      padding: 20px;
+      animation: fadeIn 1s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.98); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
     h1, h3 {
       color: #00f7ff;
       border-bottom: 2px solid #0ff5;
       padding-bottom: 5px;
     }
-    label, input, button {
+
+    input, button {
       font-size: 16px;
     }
+
     input {
       padding: 8px;
       margin: 10px 5px;
@@ -29,18 +109,7 @@
       color: #0ff;
       border-radius: 4px;
     }
-    button {
-      padding: 8px 16px;
-      background-color: #00aaff;
-      border: none;
-      color: #fff;
-      border-radius: 4px;
-      cursor: pointer;
-      box-shadow: 0 0 10px #00aaff88;
-    }
-    button:hover {
-      background-color: #0088cc;
-    }
+
     nav {
       background: #011;
       padding: 10px;
@@ -48,31 +117,37 @@
       border-radius: 8px;
       box-shadow: 0 0 10px #0ff5;
     }
+
     nav a {
       color: #0ff;
       text-decoration: none;
       margin: 0 15px;
       font-weight: bold;
     }
+
     nav a:hover {
       text-decoration: underline;
     }
+
     table {
       margin-top: 20px;
       width: 100%;
       border-collapse: collapse;
       box-shadow: 0 0 10px #0ff3;
     }
+
     th, td {
       border: 1px solid #0ff;
       padding: 10px;
       text-align: center;
       background-color: #111;
     }
+
     th {
       background-color: #033;
       color: #0ff;
     }
+
     #riskBarContainer {
       width: 100%;
       height: 30px;
@@ -82,6 +157,7 @@
       overflow: hidden;
       box-shadow: 0 0 10px #0ff5;
     }
+
     #riskBar {
       height: 100%;
       width: 0%;
@@ -89,6 +165,7 @@
       transition: width 0.5s ease, background-color 0.5s ease;
       border-radius: 6px;
     }
+
     #riskLabel {
       color: #0ff;
       margin-top: 5px;
@@ -97,64 +174,89 @@
     }
   </style>
 </head>
-<body>
-  <nav>
-    <a href="index.html">Dashboard</a>
-    <a href="risk-management.html">Risk Management</a>
-    <a href="maintenance.html">Money Management</a>
-  </nav>
+<body oncontextmenu="return false">
 
-  <h1>Risk Management - XAUUSD</h1>
-  <label for="balance">Saldo ($):</label>
-  <input type="number" id="balance" value="1000" />
-  <button onclick="calculateLayers()">Hitung Layer</button>
-
-  <div id="output"></div>
-
-  <h3>Risk Persentase</h3>
-  <div id="riskBarContainer">
-    <div id="riskBar"></div>
+  <!-- AUTH GATE -->
+  <div id="authContainer">
+    <h1>🔐 Akses Terbatas</h1>
+    <p>Masukkan Kode Akses</p>
+    <input type="password" id="accessCode" placeholder="Kode Akses..." />
+    <button onclick="validateAccess()">Masuk</button>
   </div>
-  <p id="riskLabel">Risk: 0%</p>
 
-  <h3>Tabel Layering</h3>
-  <table id="layersTable">
-    <thead>
-      <tr>
-        <th>Layer</th>
-        <th>Entry Price</th>
-        <th>Stop Loss</th>
-        <th>Take Profit</th>
-        <th>Lot</th>
-      </tr>
-    </thead>
-    <tbody id="tableBody"></tbody>
-  </table>
+  <!-- MAIN CONTENT -->
+  <div id="mainContent">
+    <nav>
+      <a href="index.html">Dashboard</a>
+      <a href="risk-management.html">Risk Management</a>
+      <a href="maintenance.html">Money Management</a>
+    </nav>
 
-  <h3>Tabel Maksimum Lot Size (Floating Max 100 pips)</h3>
-  <table id="lotTable">
-    <thead>
-      <tr><th>Saldo</th><th>Max Floating (100 pips)</th><th>Total Lot Max</th></tr>
-    </thead>
-    <tbody id="lotTableBody"></tbody>
-  </table>
+    <h1>Risk Management - XAUUSD</h1>
+    <label for="balance">Saldo ($):</label>
+    <input type="number" id="balance" value="1000" />
+    <button onclick="calculateLayers()">Hitung Layer</button>
 
-  <h3>Estimasi Recovery Profit Saat Layer 5 Running</h3>
-  <table id="recoveryTable">
-    <thead>
-      <tr>
-        <th>Layer</th>
-        <th>Harga Entry</th>
-        <th>Harga Sekarang</th>
-        <th>Status</th>
-        <th>Selisih Pips</th>
-        <th>Profit/Loss ($)</th>
-      </tr>
-    </thead>
-    <tbody id="recoveryBody"></tbody>
-  </table>
+    <div id="output"></div>
+
+    <h3>Risk Persentase</h3>
+    <div id="riskBarContainer">
+      <div id="riskBar"></div>
+    </div>
+    <p id="riskLabel">Risk: 0%</p>
+
+    <h3>Tabel Layering</h3>
+    <table id="layersTable">
+      <thead>
+        <tr>
+          <th>Layer</th>
+          <th>Entry Price</th>
+          <th>Stop Loss</th>
+          <th>Take Profit</th>
+          <th>Lot</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+
+    <h3>Tabel Maksimum Lot Size (Floating Max 100 pips)</h3>
+    <table id="lotTable">
+      <thead>
+        <tr><th>Saldo</th><th>Max Floating (100 pips)</th><th>Total Lot Max</th></tr>
+      </thead>
+      <tbody id="lotTableBody"></tbody>
+    </table>
+
+    <h3>Estimasi Recovery Profit Saat Layer 5 Running</h3>
+    <table id="recoveryTable">
+      <thead>
+        <tr>
+          <th>Layer</th>
+          <th>Harga Entry</th>
+          <th>Harga Sekarang</th>
+          <th>Status</th>
+          <th>Selisih Pips</th>
+          <th>Profit/Loss ($)</th>
+        </tr>
+      </thead>
+      <tbody id="recoveryBody"></tbody>
+    </table>
+  </div>
 
   <script>
+    // Sistem Akses
+    function validateAccess() {
+      const code = document.getElementById('accessCode').value.trim().toUpperCase();
+      if (code === 'VL') {
+        document.getElementById('authContainer').style.display = 'none';
+        document.getElementById('mainContent').style.display = 'block';
+        calculateLayers();
+      } else {
+        alert('Kode akses salah!');
+      }
+    }
+
+    // Hitung Layering
     function calculateLayers() {
       const balance = parseFloat(document.getElementById("balance").value);
       if (balance < 50) {
@@ -180,7 +282,6 @@
       const firstEntry = 3320.0;
       const takeProfit = firstEntry + 40 * pipFactor;
       const stopLossPerLayer = [30, 25, 20, 15, 10];
-
       const currentPrice = 3319.50;
 
       const tableBody = document.getElementById("tableBody");
@@ -238,7 +339,22 @@
       }
     }
 
-    calculateLayers();
+    // Disable developer tools
+    document.addEventListener("keydown", function (e) {
+      if (
+        e.key === "F12" ||
+        (e.ctrlKey && e.shiftKey && e.key === "I") ||
+        (e.ctrlKey && e.key === "u")
+      ) {
+        e.preventDefault();
+        alert("Akses developer tools diblokir!");
+        return false;
+      }
+    });
+
+    document.addEventListener("contextmenu", function (e) {
+      e.preventDefault();
+    });
   </script>
 </body>
 </html>

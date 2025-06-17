@@ -1,53 +1,168 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Trading Dashboard</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Trading Journey</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f0f2f5;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
       margin: 0;
       padding: 0;
+      color: #fff;
     }
+
+    /* KODE AKSES */
     .access-container {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 100vh;
+      animation: fadeIn 1.5s ease-out;
     }
+
+    .access-container h2 {
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+
     .access-container input {
-      padding: 10px;
+      padding: 12px 16px;
       font-size: 16px;
-      margin-top: 10px;
-      width: 200px;
+      border-radius: 8px;
+      border: 2px solid transparent;
+      outline: none;
+      transition: all 0.3s ease;
+      width: 250px;
+      background: #ffffff;
+      color: #333;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
+
+    .access-container input:focus {
+      border-color: #00c6ff;
+      box-shadow: 0 0 10px #00c6ff88;
+    }
+
     .access-container button {
-      padding: 10px 20px;
-      margin-top: 10px;
+      margin-top: 15px;
+      padding: 12px 20px;
+      width: 250px;
       font-size: 16px;
+      background: linear-gradient(to right, #00c6ff, #0072ff);
+      color: white;
+      border: none;
+      border-radius: 8px;
       cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
+
+    .access-container button:hover {
+      box-shadow: 0 0 15px #00c6ffcc;
+      transform: scale(1.03);
+    }
+
+    #accessMessage {
+      color: #ff7070;
+      margin-top: 10px;
+      font-weight: bold;
+      animation: shake 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-4px); }
+      50% { transform: translateX(4px); }
+      75% { transform: translateX(-2px); }
+      100% { transform: translateX(0); }
+    }
+
+    /* DASHBOARD */
     .container {
       display: none;
       padding: 20px;
+    }
+
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .stat-box {
+      background: white;
+      color: #333;
+      padding: 10px;
+      border-radius: 8px;
+      flex: 1;
+      min-width: 150px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+
+    form {
+      margin-bottom: 20px;
+    }
+
+    form input, form select, form button {
+      margin: 5px;
+      padding: 8px;
+      font-size: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
+      background: white;
+      color: #000;
+    }
+
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+
+    .chart-container iframe {
+      width: 100%;
+      height: 300px;
+      border: none;
+    }
+
+    button.close-btn {
+      padding: 6px 10px;
+      background-color: crimson;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button.close-btn:hover {
+      background-color: darkred;
     }
   </style>
 </head>
 <body>
 
-  <!-- Kode Akses Form -->
+  <!-- FORM AKSES -->
   <div class="access-container" id="accessContainer">
     <h2>Masukkan Kode Akses</h2>
-    <input type="text" id="accessCodeInput" placeholder="Masukkan kode...">
+    <input type="text" id="accessCodeInput" placeholder="Kode akses...">
     <button onclick="checkAccess()">Masuk</button>
-    <p id="accessMessage" style="color:red; margin-top: 10px;"></p>
+    <p id="accessMessage" style="display:none;"></p>
   </div>
 
-  <!-- Konten Dashboard -->
+  <!-- DASHBOARD -->
   <div class="container" id="dashboard">
     <h1>📈 Trading Panel</h1>
 
@@ -73,13 +188,13 @@
         <option value="SELL">SELL</option>
       </select>
       <input type="text" id="reason" placeholder="Alasan Entry" required />
-      <input type="number" step="0.01" id="entryPrice" placeholder="Harga Entry (xxxx.xx)" required />
+      <input type="number" step="0.01" id="entryPrice" placeholder="Harga Entry" required />
       <button type="submit">Tambah Posisi</button>
     </form>
 
     <div class="table-wrapper">
       <h2>📌 Posisi Terbuka</h2>
-      <table id="openTradesTable">
+      <table>
         <thead>
           <tr>
             <th>Pair</th>
@@ -95,41 +210,6 @@
       </table>
     </div>
 
-    <div class="table-wrapper">
-      <h2>✅ History Trading</h2>
-      <table id="tradeHistory">
-        <thead>
-          <tr>
-            <th>Pair</th>
-            <th>Lot</th>
-            <th>Posisi</th>
-            <th>Entry</th>
-            <th>Close</th>
-            <th>Pips</th>
-            <th>USDC</th>
-            <th>Waktu Entry</th>
-            <th>Waktu Close</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-
-    <div class="table-wrapper">
-      <h2>📅 Rekap Harian Saldo</h2>
-      <table id="dailyRecap">
-        <thead>
-          <tr>
-            <th>Tanggal</th>
-            <th>Saldo Awal</th>
-            <th>Saldo Akhir</th>
-            <th>Pertumbuhan (%)</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-
     <div class="chart-container">
       <h2>📉 Live Chart XAUUSD</h2>
       <iframe src="https://www.tradingview.com/embed-widget/mini-symbol-overview/?symbol=OANDA:XAUUSD&locale=en" allowfullscreen></iframe>
@@ -137,19 +217,45 @@
   </div>
 
   <script>
+    // Validasi akses
     function checkAccess() {
       const input = document.getElementById('accessCodeInput').value.trim().toUpperCase();
-      const allowedCode = "VL";
-      const message = document.getElementById('accessMessage');
-
-      if (input === allowedCode) {
+      const msg = document.getElementById('accessMessage');
+      if (input === "VL") {
         document.getElementById('accessContainer').style.display = 'none';
         document.getElementById('dashboard').style.display = 'block';
       } else {
-        message.textContent = "Kode akses salah!";
+        msg.textContent = "❌ Kode akses salah!";
+        msg.style.display = "block";
+        msg.style.animation = "shake 0.3s";
+        setTimeout(() => { msg.style.animation = "none"; }, 300);
       }
     }
+
+    // Tambah trade
+    document.getElementById("tradeForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const pair = document.getElementById("pair").value;
+      const lot = parseFloat(document.getElementById("lot").value).toFixed(2);
+      const position = document.getElementById("position").value;
+      const reason = document.getElementById("reason").value;
+      const entryPrice = parseFloat(document.getElementById("entryPrice").value).toFixed(2);
+      const time = new Date().toLocaleString();
+
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${pair}</td>
+        <td>${lot}</td>
+        <td>${position}</td>
+        <td>${entryPrice}</td>
+        <td>${reason}</td>
+        <td>${time}</td>
+        <td><button class="close-btn" onclick="this.closest('tr').remove()">Tutup</button></td>
+      `;
+      document.getElementById("openTradesBody").appendChild(row);
+      this.reset();
+    });
   </script>
-  <script src="script.js"></script>
+
 </body>
 </html>

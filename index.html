@@ -102,22 +102,97 @@
   nav a:hover {
     color: #fff;
   }
+   /* Risk Management Content (Hidden by default) */
+    #mainContent {
+      display: none;
+      padding: 20px;
+      animation: fadeIn 1s ease forwards;
+    }
+  /* Neon Login Container */
+    #authContainer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: radial-gradient(circle at center, #001e2f 0%, #000 100%);
+      animation: pulseGlow 5s infinite alternate;
+      box-shadow: inset 0 0 50px #00f2ff33;
+      border-radius: 12px;
+      padding: 40px;
+      text-align: center;
+    }
+
+    #authContainer h1 {
+      font-size: 2.5rem;
+      text-shadow: 0 0 10px #0ff, 0 0 20px #0ff2;
+    }
+
+    #authContainer p {
+      font-size: 1.2rem;
+      color: #88f;
+      text-shadow: 0 0 5px #0ff2;
+    }
+
+    #accessCode {
+      padding: 12px;
+      font-size: 1.1rem;
+      width: 240px;
+      border: none;
+      border-radius: 8px;
+      background: #020b14;
+      color: #0ff;
+      outline: none;
+      box-shadow: 0 0 10px #00f2ff88;
+    }
+
+    #accessCode:focus {
+      box-shadow: 0 0 20px #00f2ffcc;
+    }
+
+    #authContainer button {
+      margin-top: 20px;
+      padding: 10px 24px;
+      background: #00aaff;
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 1.1rem;
+      cursor: pointer;
+      box-shadow: 0 0 10px #00f2ffaa;
+      transition: background 0.3s ease, transform 0.3s ease;
+    }
+
+    #authContainer button:hover {
+      background: #008ecc;
+      transform: scale(1.05);
+      box-shadow: 0 0 20px #00f2ffff;
+    }
+   @keyframes pulseGlow {
+      0% { box-shadow: inset 0 0 30px #00f2ff33; }
+      100% { box-shadow: inset 0 0 60px #00f2ff99; }
+    }
+
 </style>
 </head>
 <body>
-<div class="container">
-  <nav>
-    <a href="index.html">Dashboard</a>
-    <a href="risk-management.html">Risk Management</a>
-    <a href="maintenance.html">Money Management</a>
-  </nav>
+<body oncontextmenu="return false">
 
-  <h1>Login Trading Journey</h1>
-  <form id="loginForm">
-    <label for="accessCode">Masukkan Kode Akses: </label>
-    <input type="text" id="accessCode" required autocomplete="off" />
-    <button type="submit">Login</button>
-  </form>
+  <!-- AUTH GATE -->
+  <div id="authContainer">
+    <h1>🔐 Akses Terbatas</h1>
+    <p>Masukkan Kode Akses</p>
+    <input type="password" id="accessCode" placeholder="Kode Akses..." />
+    <button onclick="validateAccess()">Masuk</button>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div id="mainContent">
+    <nav>
+      <a href="index.html">Dashboard</a>
+      <a href="risk-management.html">Risk Management</a>
+      <a href="maintenance.html">Money Management</a>
+    </nav>
 
   <div id="dashboard">
     <h2>Welcome, <span id="usernameDisplay"></span>!</h2>

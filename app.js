@@ -1,29 +1,29 @@
-// app.js
-
 // ========== BLOKIR DEV TOOLS & KLIK KANAN ==========
 document.addEventListener("contextmenu", e => e.preventDefault());
 document.addEventListener("keydown", e => {
-  if (e.ctrlKey && ["i", "j", "u", "s"].includes(e.key.toLowerCase()) || e.key === "F12") {
+  if ((e.ctrlKey && ["i", "j", "u", "s"].includes(e.key.toLowerCase())) || e.key === "F12") {
     e.preventDefault();
   }
 });
 
-// Sistem Akses
-    function validateAccess() {
-      const code = document.getElementById('accessCode').value.trim().toUpperCase();
-      if (code === 'VL') {
-        document.getElementById('authContainer').style.display = 'none';
-        document.getElementById('mainContent').style.display = 'block';
-        calculateLayers();
-      } else {
-        alert('Kode akses salah!');
-      }
-    }
-});
+// ========== SISTEM AKSES ==========
+function validateAccess() {
+  const input = document.getElementById('accessCode');
+  if (!input) return alert("Input kode akses tidak ditemukan.");
+  const code = input.value.trim().toUpperCase();
+  if (code === 'VL') {
+    document.getElementById('authContainer').style.display = 'none';
+    document.getElementById('mainContent').style.display = 'block';
+    if (typeof calculateLayers === "function") calculateLayers();
+    loadFromLocalStorage();
+  } else {
+    alert('Kode akses salah!');
+  }
+}
 
 // ========== TAMBAH POSISI TERBUKA ==========
 const openTrades = JSON.parse(localStorage.getItem("openTrades") || "[]");
-document.getElementById("openTradeForm").addEventListener("submit", function(e) {
+document.getElementById("openTradeForm")?.addEventListener("submit", function (e) {
   e.preventDefault();
   const pair = document.getElementById("pair").value;
   const lot = parseFloat(document.getElementById("lot").value);
@@ -31,6 +31,10 @@ document.getElementById("openTradeForm").addEventListener("submit", function(e) 
   const entryPrice = parseFloat(document.getElementById("entryPrice").value);
   const reason = document.getElementById("reason").value;
   const entryTime = new Date().toLocaleString();
+
+  if (!pair || isNaN(lot) || !position || isNaN(entryPrice)) {
+    return alert("Mohon isi semua field dengan benar.");
+  }
 
   const trade = { pair, lot, position, entryPrice, reason, entryTime };
   openTrades.push(trade);
@@ -41,6 +45,7 @@ document.getElementById("openTradeForm").addEventListener("submit", function(e) 
 
 function renderOpenTrades() {
   const tbody = document.getElementById("openTradesBody");
+  if (!tbody) return;
   tbody.innerHTML = "";
   openTrades.forEach((t, i) => {
     const tr = document.createElement("tr");
@@ -55,23 +60,29 @@ function renderOpenTrades() {
 // ========== TUTUP POSISI ==========
 const history = JSON.parse(localStorage.getItem("tradeHistory") || "[]");
 function closeTrade(index) {
-  const exitPrice = parseFloat(prompt("Harga tutup?").replace(",", "."));
+  const input = prompt("Harga tutup?");
+  if (!input) return;
+  const exitPrice = parseFloat(input.replace(",", "."));
   if (isNaN(exitPrice)) return alert("Harga tidak valid.");
+
   const trade = openTrades.splice(index, 1)[0];
   const pips = (trade.position === "BUY" ? exitPrice - trade.entryPrice : trade.entryPrice - exitPrice) * 10;
   const profit = (pips * trade.lot * 0.1).toFixed(2); // 0.1 USD per pip per 0.01 lot
   const closeTime = new Date().toLocaleString();
   const result = { ...trade, exitPrice, pips: pips.toFixed(1), profit, closeTime };
   history.push(result);
+
   localStorage.setItem("openTrades", JSON.stringify(openTrades));
   localStorage.setItem("tradeHistory", JSON.stringify(history));
   renderOpenTrades();
   renderTradeHistory();
+  updateDailySummary();
 }
 
 // ========== RENDER HISTORY ==========
 function renderTradeHistory() {
   const tbody = document.querySelector("#tradeHistory tbody");
+  if (!tbody) return;
   tbody.innerHTML = "";
   history.forEach(t => {
     const tr = document.createElement("tr");
@@ -88,12 +99,13 @@ function updateDailySummary() {
   const dataByDate = {};
   history.forEach(t => {
     const date = new Date(t.closeTime).toLocaleDateString();
-    if (!dataByDate[date]) dataByDate[date] = { start: 0, end: 0, totalTrades: 0, profits: 0 };
+    if (!dataByDate[date]) dataByDate[date] = { totalTrades: 0, profits: 0 };
     dataByDate[date].totalTrades++;
     dataByDate[date].profits += parseFloat(t.profit);
   });
 
   const tbody = document.querySelector("#dailySummaryTable tbody");
+  if (!tbody) return;
   tbody.innerHTML = "";
   Object.entries(dataByDate).forEach(([date, data]) => {
     const saldoAwal = 1000;
@@ -121,11 +133,11 @@ function downloadCSV(data, headers, filename) {
   URL.revokeObjectURL(url);
 }
 
-document.getElementById("downloadHistory").onclick = () => {
+document.getElementById("downloadHistory")?.addEventListener("click", () => {
   downloadCSV(history, ["pair", "lot", "position", "entryPrice", "exitPrice", "pips", "profit", "entryTime", "closeTime", "reason"], "riwayat_trading.csv");
-};
+});
 
-document.getElementById("downloadRekap").onclick = () => {
+document.getElementById("downloadRekap")?.addEventListener("click", () => {
   const data = [];
   document.querySelectorAll("#dailySummaryTable tbody tr").forEach(tr => {
     const tds = tr.querySelectorAll("td");
@@ -139,7 +151,7 @@ document.getElementById("downloadRekap").onclick = () => {
     });
   });
   downloadCSV(data, ["Tanggal", "SaldoAwal", "SaldoAkhir", "Pertumbuhan", "TotalTrade", "Analisa"], "rekap_trading.csv");
-};
+});
 
 // ========== MUAT DATA DARI LOCAL STORAGE ==========
 function loadFromLocalStorage() {
@@ -147,3 +159,8 @@ function loadFromLocalStorage() {
   renderTradeHistory();
   updateDailySummary();
 }
+
+// ========== PANGGIL SAAT PERTAMA DIMUAT ==========
+window.addEventListener("DOMContentLoaded", () => {
+  // Akses tidak langsung ditampilkan, tunggu validasi
+});

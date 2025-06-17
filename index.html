@@ -1,581 +1,273 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
   <title>Trading Dashboard</title>
   <style>
-    /* Reset & base */
     * {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
+
     body {
-      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-      color: #e0e6f0;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f6f8;
+      margin: 0;
       padding: 2rem;
-      transition: background 0.5s ease-in-out;
+      color: #333;
     }
 
-    /* Access container */
-    #accessContainer {
-      background: #1b2735;
-      padding: 2.5rem 3rem;
-      border-radius: 15px;
-      box-shadow:
-        0 4px 15px rgba(0,0,0,0.7),
-        inset 0 0 15px #00ffd1;
-      width: 360px;
+    h1 {
       text-align: center;
-      animation: fadeIn 0.8s ease forwards;
+      margin-bottom: 2rem;
     }
-    #accessContainer h2 {
-      margin-bottom: 1.5rem;
-      font-weight: 700;
-      font-size: 1.8rem;
-      color: #00ffd1;
-      letter-spacing: 1.2px;
-      text-shadow: 0 0 8px #00ffd1;
+
+    .section {
+      background: white;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
-    #accessContainer input {
-      width: 100%;
-      padding: 1rem 1.2rem;
-      font-size: 1.3rem;
-      border-radius: 12px;
-      border: 2px solid #00ffd1;
-      background: #0e141b;
-      color: #b3e9e0;
-      box-shadow:
-        0 0 12px rgba(0, 255, 209, 0.5);
-      transition:
-        box-shadow 0.3s ease,
-        border-color 0.3s ease;
-      outline: none;
-      font-weight: 600;
-      letter-spacing: 0.05em;
+
+    form label {
+      margin-right: 1rem;
     }
-    #accessContainer input::placeholder {
-      color: #40e8cd99;
+
+    input {
+      padding: 0.5rem;
+      margin: 0.3rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
     }
-    #accessContainer input:focus {
-      border-color: #00ffc9;
-      box-shadow:
-        0 0 15px #00ffc9,
-        0 0 30px #00ffc9;
-    }
-    #accessContainer button {
-      margin-top: 1.2rem;
-      background: #00ffd1;
-      color: #0f2027;
-      font-weight: 700;
-      padding: 1rem 2.5rem;
-      font-size: 1.25rem;
-      border-radius: 12px;
+
+    button {
+      padding: 0.5rem 1rem;
+      background-color: #007bff;
       border: none;
+      color: white;
+      border-radius: 4px;
       cursor: pointer;
-      box-shadow: 0 8px 25px #00ffd1aa;
-      transition:
-        background 0.3s ease,
-        box-shadow 0.3s ease,
-        transform 0.15s ease;
-      user-select: none;
-      letter-spacing: 0.1em;
-    }
-    #accessContainer button:hover {
-      background: #00e8c3;
-      box-shadow: 0 10px 30px #00e8c3cc;
-      transform: translateY(-2px);
-    }
-    #accessContainer button:active {
-      transform: translateY(1px);
-      box-shadow: 0 6px 18px #00d8b3aa;
-    }
-    #accessMessage {
-      margin-top: 1rem;
-      font-weight: 600;
-      color: #ff5c5c;
-      font-size: 1rem;
-      letter-spacing: 0.05em;
-      min-height: 1.2em;
-      user-select: none;
-      animation-duration: 0.4s;
-    }
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      20%, 60% { transform: translateX(-8px); }
-      40%, 80% { transform: translateX(8px); }
-    }
-    @keyframes fadeIn {
-      from {opacity: 0; transform: translateY(25px);}
-      to {opacity: 1; transform: translateY(0);}
     }
 
-    /* Dashboard container */
-    #dashboard {
-      max-width: 1100px;
-      background: #121b27cc;
-      padding: 2rem 3rem 3rem;
-      border-radius: 20px;
-      box-shadow:
-        0 8px 30px rgba(0,0,0,0.5),
-        inset 0 0 25px #00ffd1cc;
-      color: #d1faff;
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-      animation: fadeIn 0.8s ease forwards;
-    }
-    #dashboard h1 {
-      font-size: 2.7rem;
-      font-weight: 900;
-      letter-spacing: 0.12em;
-      color: #00ffe7;
-      text-shadow:
-        0 0 10px #00ffe7,
-        0 0 30px #00ffe7aa;
-      text-align: center;
-      margin-bottom: 1rem;
-      user-select: none;
+    button:hover {
+      background-color: #0056b3;
     }
 
-    /* Stats */
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit,minmax(140px,1fr));
-      gap: 1.3rem;
-    }
-    .stat-box {
-      background: #152433cc;
-      border-radius: 15px;
-      box-shadow:
-        0 0 12px #00ffd1aa;
-      padding: 1rem 1.2rem;
-      text-align: center;
-      transition: background 0.3s ease;
-      cursor: default;
-      user-select: none;
-    }
-    .stat-box:hover {
-      background: #1c3452cc;
-      box-shadow:
-        0 0 20px #00ffd1ff;
-    }
-    .stat-box h3 {
-      font-size: 1.1rem;
-      margin-bottom: 6px;
-      color: #00fff0;
-      text-shadow: 0 0 8px #00fff0bb;
-    }
-    .stat-box span {
-      font-weight: 700;
-      font-size: 1.3rem;
-      color: #d0ffff;
-      letter-spacing: 0.05em;
-    }
-
-    /* Form */
-    form#tradeForm {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      justify-content: center;
-      background: #152433cc;
-      padding: 1.5rem 2rem;
-      border-radius: 18px;
-      box-shadow:
-        0 0 15px #00ffcdaa;
-    }
-    form#tradeForm select,
-    form#tradeForm input[type=number],
-    form#tradeForm input[type=text] {
-      flex: 1 1 180px;
-      background: #0e1726;
-      border: 2px solid #00ffd1;
-      border-radius: 12px;
-      padding: 0.8rem 1rem;
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: #b3e9e0;
-      box-shadow:
-        inset 0 0 8px #00ffd1cc;
-      transition:
-        border-color 0.3s ease,
-        box-shadow 0.3s ease;
-    }
-    form#tradeForm select:hover,
-    form#tradeForm input[type=number]:hover,
-    form#tradeForm input[type=text]:hover {
-      border-color: #00fff8;
-      box-shadow:
-        inset 0 0 15px #00fff8cc;
-    }
-    form#tradeForm select:focus,
-    form#tradeForm input[type=number]:focus,
-    form#tradeForm input[type=text]:focus {
-      outline: none;
-      border-color: #00fff8;
-      box-shadow:
-        0 0 20px #00fff8aa;
-      background: #132239;
-      color: #d4fff9;
-    }
-    form#tradeForm button {
-      background: #00ffd1;
-      color: #0f2027;
-      font-weight: 900;
-      padding: 1rem 3rem;
-      font-size: 1.3rem;
-      border-radius: 15px;
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 10px 30px #00ffd1bb;
-      user-select: none;
-      flex: 0 0 auto;
-      align-self: center;
-      transition:
-        background 0.35s ease,
-        box-shadow 0.35s ease,
-        transform 0.15s ease;
-      letter-spacing: 0.12em;
-    }
-    form#tradeForm button:hover {
-      background: #00e8c3;
-      box-shadow: 0 14px 38px #00e8c3cc;
-      transform: translateY(-3px);
-    }
-    form#tradeForm button:active {
-      transform: translateY(1px);
-      box-shadow: 0 7px 20px #00d8b3aa;
-    }
-
-    /* Tables */
-    .table-wrapper {
-      background: #152433cc;
-      border-radius: 20px;
-      padding: 1rem 1.5rem;
-      box-shadow:
-        0 0 15px #00ffd1aa;
-      overflow-x: auto;
-    }
-    .table-wrapper h2 {
-      margin-bottom: 1rem;
-      color: #00ffe7;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-shadow: 0 0 10px #00ffe7aa;
-      user-select: none;
-    }
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.95rem;
-      color: #c9faff;
-      user-select: none;
+      margin-top: 1rem;
     }
-    thead tr {
-      background: #0f1c2b;
-      letter-spacing: 0.06em;
-      font-weight: 700;
-      text-align: center;
-      text-shadow: 0 0 8px #00e8c3cc;
-    }
+
     th, td {
-      padding: 0.7rem 0.8rem;
-      border-bottom: 1px solid #002b3a;
-      border-right: 1px solid #002b3a;
-    }
-    th:last-child, td:last-child {
-      border-right: none;
-    }
-    tbody tr:hover {
-      background: #00ffd1aa;
-      color: #0f2027;
-      font-weight: 700;
-      transition: background 0.3s ease;
-    }
-    button.close-btn {
-      background: #ff4c4c;
-      border: none;
-      border-radius: 12px;
-      padding: 0.4rem 1rem;
-      color: #fff;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 4px 15px #ff4c4caa;
-      transition:
-        background 0.25s ease,
-        box-shadow 0.25s ease,
-        transform 0.15s ease;
-      user-select: none;
-    }
-    button.close-btn:hover {
-      background: #ff1f1f;
-      box-shadow: 0 6px 20px #ff1f1faa;
-      transform: translateY(-2px);
-    }
-    button.close-btn:active {
-      transform: translateY(1px);
-      box-shadow: 0 3px 10px #ff0f0faa;
-    }
-
-    /* Chart container */
-    .chart-container {
-      margin-top: 1.5rem;
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow:
-        0 8px 30px #00ffd1bb;
-      background: #0f1927;
-      user-select: none;
-    }
-    .chart-container h2 {
-      color: #00ffd1;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
       text-align: center;
-      font-weight: 700;
-      padding: 0.9rem 0;
-      text-shadow: 0 0 15px #00ffd1aa;
-      letter-spacing: 0.08em;
-      user-select: none;
-    }
-    .chart-container iframe {
-      width: 100%;
-      height: 320px;
-      border: none;
     }
 
-    /* Responsive */
-    @media (max-width: 680px) {
-      #accessContainer, #dashboard {
-        width: 90vw;
-        padding: 1.5rem 1.8rem;
-      }
-      form#tradeForm {
+    th {
+      background-color: #f0f0f0;
+    }
+
+    .summary p {
+      font-size: 1.1rem;
+      margin: 0.5rem 0;
+    }
+
+    .reset-btn {
+      margin-top: 1rem;
+      background-color: #dc3545;
+    }
+
+    .reset-btn:hover {
+      background-color: #a71d2a;
+    }
+
+    @media (max-width: 768px) {
+      form {
+        display: flex;
         flex-direction: column;
       }
-      form#tradeForm select,
-      form#tradeForm input[type=number],
-      form#tradeForm input[type=text],
-      form#tradeForm button {
-        width: 100%;
+
+      form label {
+        margin-bottom: 0.5rem;
       }
     }
   </style>
 </head>
 <body>
-  <div id="accessContainer">
-    <h2>🔒 Masukkan Kode Akses</h2>
-    <input type="password" id="accessCodeInput" placeholder="Masukan Kode Akses" />
-    <button onclick="checkAccess()">Masuk</button>
-    <div id="accessMessage"></div>
+
+  <h1>Trading Dashboard</h1>
+
+  <div class="section">
+    <h2>Input Trade Baru</h2>
+    <form id="tradeForm">
+      <label>Pair: <input type="text" id="pair" required></label>
+      <label>Lot: <input type="number" id="lot" step="0.01" required></label>
+      <label>Entry: <input type="number" id="entry" required></label>
+      <label>TP: <input type="number" id="tp"></label>
+      <label>SL: <input type="number" id="sl"></label>
+      <button type="submit">Tambah Trade</button>
+    </form>
   </div>
 
-  <div id="dashboard" style="display:none;">
-    <h1>📈 Trading Panel</h1>
+  <div class="section">
+    <h2>Trade Aktif</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Pair</th>
+          <th>Lot</th>
+          <th>Entry</th>
+          <th>TP</th>
+          <th>SL</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="tradeList"></tbody>
+    </table>
+  </div>
 
-    <div class="stats">
-      <div class="stat-box"><h3>Saldo Awal</h3><span id="initialBalance">1250.00 USDc</span></div>
-      <div class="stat-box"><h3>Saldo Akhir</h3><span id="finalBalance">1250.00 USDc</span></div>
-      <div class="stat-box"><h3>Total Pips</h3><span id="totalPips">0</span></div>
-      <div class="stat-box"><h3>Total USDc</h3><span id="totalUSDC">0</span></div>
-      <div class="stat-box"><h3>Total Trade</h3><span id="totalTrades">0</span></div>
-      <div class="stat-box"><h3>Win Trade ✅</h3><span id="winTrades">0</span></div>
-      <div class="stat-box"><h3>Loss Trade ❌</h3><span id="lossTrades">0</span></div>
-      <div class="stat-box"><h3>Winrate 🏆</h3><span id="winrate">0%</span></div>
-    </div>
+  <div class="section">
+    <h2>Riwayat Trade</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Pair</th>
+          <th>Lot</th>
+          <th>Entry</th>
+          <th>TP</th>
+          <th>SL</th>
+          <th>Waktu Close</th>
+        </tr>
+      </thead>
+      <tbody id="tradeHistory"></tbody>
+    </table>
+  </div>
 
-    <form id="tradeForm">
-      <select id="pair" title="Pilih pasangan trading">
-        <option value="XAUUSDc">XAUUSDc</option>
-        <option value="BTCUSDc">BTCUSDc</option>
-      </select>
-      <input type="number" step="0.01" id="lot" placeholder="Lot (e.g. 0.01)" required title="Masukkan lot"/>
-      <select id="position" title="Posisi BUY atau SELL">
-        <option value="BUY">BUY</option>
-        <option value="SELL">SELL</option>
-      </select>
-      <input type="text" id="reason" placeholder="Alasan Entry" required title="Alasan membuka posisi" />
-      <input type="number" step="0.01" id="entryPrice" placeholder="Harga Entry (xxxx.xx)" required title="Harga entry"/>
-      <button type="submit" title="Tambah posisi trading">Tambah Posisi</button>
-    </form>
-
-    <div class="table-wrapper">
-      <h2>📌 Posisi Terbuka</h2>
-      <table id="openTradesTable">
-        <thead>
-          <tr><th>Pair</th><th>Lot</th><th>Posisi</th><th>Entry</th><th>Alasan</th><th>Waktu</th><th>Action</th></tr>
-        </thead>
-        <tbody id="openTradesBody"></tbody>
-      </table>
-    </div>
-
-    <div class="table-wrapper">
-      <h2>✅ History Trading</h2>
-      <table id="tradeHistory">
-        <thead>
-          <tr><th>Pair</th><th>Lot</th><th>Posisi</th><th>Entry</th><th>Close</th><th>Pips</th><th>USDC</th><th>Waktu Entry</th><th>Waktu Close</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-
-    <div class="chart-container">
-      <h2>📉 Live Chart XAUUSD</h2>
-      <iframe src="https://www.tradingview.com/embed-widget/mini-symbol-overview/?symbol=OANDA:XAUUSD&locale=en" allowfullscreen></iframe>
-    </div>
+  <div class="section summary">
+    <h2>Ringkasan</h2>
+    <p>✅ Win: <span id="winCounter">0</span></p>
+    <p>❌ Loss: <span id="lossCounter">0</span></p>
+    <p>💰 Saldo Akhir: $<span id="finalBalance">0</span></p>
+    <button class="reset-btn" onclick="resetAllData()">Reset Semua</button>
   </div>
 
   <script>
-    let initialBalance = 1250.00;
-    let finalBalance = 1250.00;
-    let winTrades = 0;
-    let lossTrades = 0;
-    let totalPips = 0;
-    let totalTrades = 0;
-
-    function checkAccess() {
-      const input = document.getElementById('accessCodeInput').value.trim().toUpperCase();
-      const msg = document.getElementById('accessMessage');
-      if (input === "VL") {
-        document.getElementById('accessContainer').style.display = 'none';
-        document.getElementById('dashboard').style.display = 'flex';
-      } else {
-        msg.textContent = "❌ Kode akses salah!";
-        msg.style.display = "block";
-        msg.style.animation = "shake 0.4s";
-        setTimeout(() => { msg.style.animation = ""; }, 400);
-      }
-    }
-
-    document.getElementById("tradeForm").addEventListener("submit", function(e) {
+    // Form submit handler
+    document.getElementById("tradeForm").addEventListener("submit", function (e) {
       e.preventDefault();
 
       const pair = document.getElementById("pair").value;
       const lot = parseFloat(document.getElementById("lot").value);
-      const position = document.getElementById("position").value;
-      const reason = document.getElementById("reason").value.trim();
-      const entryPrice = parseFloat(document.getElementById("entryPrice").value);
-      const now = new Date().toLocaleString();
+      const entry = document.getElementById("entry").value;
+      const tp = document.getElementById("tp").value || "-";
+      const sl = document.getElementById("sl").value || "-";
 
-      if (isNaN(lot) || lot <= 0 || isNaN(entryPrice)) {
-        alert("Lot dan harga entry harus angka valid lebih dari 0.");
-        return;
-      }
-      if (!reason) {
-        alert("Alasan entry harus diisi.");
-        return;
-      }
-
-      addOpenTrade({ pair, lot, position, reason, entryPrice, time: now });
-      this.reset();
-    });
-
-    function addOpenTrade(trade) {
-      const tbody = document.getElementById("openTradesBody");
-      const tr = document.createElement("tr");
-
-      tr.innerHTML = `
-        <td>${trade.pair}</td>
-        <td>${trade.lot.toFixed(2)}</td>
-        <td>${trade.position}</td>
-        <td>${trade.entryPrice.toFixed(2)}</td>
-        <td>${trade.reason}</td>
-        <td>${trade.time}</td>
-        <td><button class="close-btn" onclick='closeTrade(this)'>Close</button></td>
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${pair}</td>
+        <td>${lot}</td>
+        <td>${entry}</td>
+        <td>${tp}</td>
+        <td>${sl}</td>
+        <td><button onclick="closeTrade(this)">Close</button></td>
       `;
+      document.getElementById("tradeList").appendChild(row);
 
-      tbody.appendChild(tr);
-      totalTrades++;
-      updateStats();
-    }
+      document.getElementById("tradeForm").reset();
+      saveToLocalStorage();
+    });
 
     function closeTrade(button) {
       const row = button.closest("tr");
-      const cells = row.children;
-
+      const cells = row.querySelectorAll("td");
       const pair = cells[0].textContent;
       const lot = parseFloat(cells[1].textContent);
-      const position = cells[2].textContent;
-      const entryPrice = parseFloat(cells[3].textContent);
-      const reason = cells[4].textContent;
-      const entryTime = cells[5].textContent;
+      const entry = cells[2].textContent;
+      const tp = cells[3].textContent;
+      const sl = cells[4].textContent;
       const closeTime = new Date().toLocaleString();
 
-      let closePrice = prompt(`Tutup posisi ${pair} ${position} dengan harga (contoh: 1234.56):`);
-      if (closePrice === null) return; // batal
-      closePrice = parseFloat(closePrice);
-      if (isNaN(closePrice) || closePrice <= 0) {
-        alert("Harga tutup harus angka valid > 0");
-        return;
-      }
+      const historyRow = document.createElement("tr");
+      historyRow.innerHTML = `
+        <td>${pair}</td>
+        <td>${lot}</td>
+        <td>${entry}</td>
+        <td>${tp}</td>
+        <td>${sl}</td>
+        <td>${closeTime}</td>
+      `;
+      document.getElementById("tradeHistory").appendChild(historyRow);
 
-      // Hitung pips & USDc sesuai posisi
-      let pips;
-      if (position === "BUY") {
-        pips = (closePrice - entryPrice) * 100; // misal pips dihitung 1 pips = 0.01 harga, dikali 100 untuk konversi (sesuaikan)
-      } else {
-        pips = (entryPrice - closePrice) * 100;
-      }
-      pips = parseFloat(pips.toFixed(2));
+      // Simulasi win/loss
+      const isWin = Math.random() > 0.5;
+      const profit = isWin ? lot * 10 : -lot * 10;
 
-      const usdPerPip = 0.1; // asumsi 1 pip = 0.1 USDc per lot (ubah sesuai kebutuhan)
-      let profit = pips * lot * 10 * usdPerPip;
-      profit = parseFloat(profit.toFixed(2));
+      const balanceEl = document.getElementById("finalBalance");
+      balanceEl.textContent = (parseFloat(balanceEl.textContent) + profit).toFixed(2);
 
-      // Update final balance
-      finalBalance += profit;
+      const counter = document.getElementById(isWin ? "winCounter" : "lossCounter");
+      counter.textContent = parseInt(counter.textContent) + 1;
 
-      // Update win/loss
-      if (profit > 0) winTrades++;
-      else if (profit < 0) lossTrades++;
+      row.remove();
+      saveToLocalStorage();
+    }
 
-      totalPips += pips;
-
-      // Pindah ke history
-      addTradeHistory({
-        pair, lot, position, entryPrice, closePrice,
-        pips, usd: profit, entryTime, closeTime
+    function saveToLocalStorage() {
+      const openTrades = [];
+      document.querySelectorAll("#tradeList tr").forEach(row => {
+        const cells = row.querySelectorAll("td");
+        openTrades.push({
+          pair: cells[0].textContent,
+          lot: cells[1].textContent,
+          entry: cells[2].textContent,
+          tp: cells[3].textContent,
+          sl: cells[4].textContent
+        });
       });
 
-      // Hapus row posisi terbuka
-      row.remove();
-      updateStats();
+      localStorage.setItem("openTrades", JSON.stringify(openTrades));
+      localStorage.setItem("tradeHistory", document.getElementById("tradeHistory").innerHTML);
+      localStorage.setItem("finalBalance", document.getElementById("finalBalance").textContent);
+      localStorage.setItem("winCounter", document.getElementById("winCounter").textContent);
+      localStorage.setItem("lossCounter", document.getElementById("lossCounter").textContent);
     }
 
-    function addTradeHistory(trade) {
-      const tbody = document.querySelector("#tradeHistory tbody");
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${trade.pair}</td>
-        <td>${trade.lot.toFixed(2)}</td>
-        <td>${trade.position}</td>
-        <td>${trade.entryPrice.toFixed(2)}</td>
-        <td>${trade.closePrice.toFixed(2)}</td>
-        <td>${trade.pips}</td>
-        <td>${trade.usd.toFixed(2)}</td>
-        <td>${trade.entryTime}</td>
-        <td>${trade.closeTime}</td>
-      `;
-      tbody.appendChild(tr);
+    function loadFromLocalStorage() {
+      const trades = JSON.parse(localStorage.getItem("openTrades"));
+      const historyHTML = localStorage.getItem("tradeHistory");
+      const balance = localStorage.getItem("finalBalance");
+      const win = localStorage.getItem("winCounter");
+      const loss = localStorage.getItem("lossCounter");
+
+      if (trades) {
+        trades.forEach(trade => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${trade.pair}</td>
+            <td>${trade.lot}</td>
+            <td>${trade.entry}</td>
+            <td>${trade.tp}</td>
+            <td>${trade.sl}</td>
+            <td><button onclick="closeTrade(this)">Close</button></td>
+          `;
+          document.getElementById("tradeList").appendChild(row);
+        });
+      }
+
+      if (historyHTML) document.getElementById("tradeHistory").innerHTML = historyHTML;
+      if (balance) document.getElementById("finalBalance").textContent = balance;
+      if (win) document.getElementById("winCounter").textContent = win;
+      if (loss) document.getElementById("lossCounter").textContent = loss;
     }
 
-    function updateStats() {
-      document.getElementById("initialBalance").textContent = initialBalance.toFixed(2) + " USDc";
-      document.getElementById("finalBalance").textContent = finalBalance.toFixed(2) + " USDc";
-      document.getElementById("totalPips").textContent = totalPips.toFixed(2);
-      document.getElementById("totalUSDC").textContent = (finalBalance - initialBalance).toFixed(2);
-      document.getElementById("totalTrades").textContent = totalTrades;
-      document.getElementById("winTrades").textContent = winTrades;
-      document.getElementById("lossTrades").textContent = lossTrades;
-
-      let winrate = totalTrades > 0 ? ((winTrades / totalTrades) * 100) : 0;
-      document.getElementById("winrate").textContent = winrate.toFixed(1) + "%";
+    function resetAllData() {
+      localStorage.clear();
+      location.reload();
     }
+
+    document.addEventListener("DOMContentLoaded", loadFromLocalStorage);
   </script>
 </body>
 </html>

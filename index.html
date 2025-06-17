@@ -2,93 +2,368 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Trading Dashboard</title>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f0f4f8;
+    /* Reset & base */
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
+      font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
-    .container {
-      max-width: 1000px;
-      margin: auto;
-      padding: 20px;
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-    .stats {
+    body {
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #e0e6f0;
+      min-height: 100vh;
       display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
-      margin-bottom: 20px;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 2rem;
+      transition: background 0.5s ease-in-out;
+    }
+
+    /* Access container */
+    #accessContainer {
+      background: #1b2735;
+      padding: 2.5rem 3rem;
+      border-radius: 15px;
+      box-shadow:
+        0 4px 15px rgba(0,0,0,0.7),
+        inset 0 0 15px #00ffd1;
+      width: 360px;
+      text-align: center;
+      animation: fadeIn 0.8s ease forwards;
+    }
+    #accessContainer h2 {
+      margin-bottom: 1.5rem;
+      font-weight: 700;
+      font-size: 1.8rem;
+      color: #00ffd1;
+      letter-spacing: 1.2px;
+      text-shadow: 0 0 8px #00ffd1;
+    }
+    #accessContainer input {
+      width: 100%;
+      padding: 1rem 1.2rem;
+      font-size: 1.3rem;
+      border-radius: 12px;
+      border: 2px solid #00ffd1;
+      background: #0e141b;
+      color: #b3e9e0;
+      box-shadow:
+        0 0 12px rgba(0, 255, 209, 0.5);
+      transition:
+        box-shadow 0.3s ease,
+        border-color 0.3s ease;
+      outline: none;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+    #accessContainer input::placeholder {
+      color: #40e8cd99;
+    }
+    #accessContainer input:focus {
+      border-color: #00ffc9;
+      box-shadow:
+        0 0 15px #00ffc9,
+        0 0 30px #00ffc9;
+    }
+    #accessContainer button {
+      margin-top: 1.2rem;
+      background: #00ffd1;
+      color: #0f2027;
+      font-weight: 700;
+      padding: 1rem 2.5rem;
+      font-size: 1.25rem;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 8px 25px #00ffd1aa;
+      transition:
+        background 0.3s ease,
+        box-shadow 0.3s ease,
+        transform 0.15s ease;
+      user-select: none;
+      letter-spacing: 0.1em;
+    }
+    #accessContainer button:hover {
+      background: #00e8c3;
+      box-shadow: 0 10px 30px #00e8c3cc;
+      transform: translateY(-2px);
+    }
+    #accessContainer button:active {
+      transform: translateY(1px);
+      box-shadow: 0 6px 18px #00d8b3aa;
+    }
+    #accessMessage {
+      margin-top: 1rem;
+      font-weight: 600;
+      color: #ff5c5c;
+      font-size: 1rem;
+      letter-spacing: 0.05em;
+      min-height: 1.2em;
+      user-select: none;
+      animation-duration: 0.4s;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(25px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    /* Dashboard container */
+    #dashboard {
+      max-width: 1100px;
+      background: #121b27cc;
+      padding: 2rem 3rem 3rem;
+      border-radius: 20px;
+      box-shadow:
+        0 8px 30px rgba(0,0,0,0.5),
+        inset 0 0 25px #00ffd1cc;
+      color: #d1faff;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      animation: fadeIn 0.8s ease forwards;
+    }
+    #dashboard h1 {
+      font-size: 2.7rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      color: #00ffe7;
+      text-shadow:
+        0 0 10px #00ffe7,
+        0 0 30px #00ffe7aa;
+      text-align: center;
+      margin-bottom: 1rem;
+      user-select: none;
+    }
+
+    /* Stats */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit,minmax(140px,1fr));
+      gap: 1.3rem;
     }
     .stat-box {
-      flex: 1 1 200px;
-      background: #fff;
-      padding: 15px;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      background: #152433cc;
+      border-radius: 15px;
+      box-shadow:
+        0 0 12px #00ffd1aa;
+      padding: 1rem 1.2rem;
+      text-align: center;
+      transition: background 0.3s ease;
+      cursor: default;
+      user-select: none;
     }
-    form {
-      background: #fff;
-      padding: 15px;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
+    .stat-box:hover {
+      background: #1c3452cc;
+      box-shadow:
+        0 0 20px #00ffd1ff;
     }
-    form input, form select, form button {
-      margin: 5px;
-      padding: 8px;
+    .stat-box h3 {
+      font-size: 1.1rem;
+      margin-bottom: 6px;
+      color: #00fff0;
+      text-shadow: 0 0 8px #00fff0bb;
     }
+    .stat-box span {
+      font-weight: 700;
+      font-size: 1.3rem;
+      color: #d0ffff;
+      letter-spacing: 0.05em;
+    }
+
+    /* Form */
+    form#tradeForm {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+      background: #152433cc;
+      padding: 1.5rem 2rem;
+      border-radius: 18px;
+      box-shadow:
+        0 0 15px #00ffcdaa;
+    }
+    form#tradeForm select,
+    form#tradeForm input[type=number],
+    form#tradeForm input[type=text] {
+      flex: 1 1 180px;
+      background: #0e1726;
+      border: 2px solid #00ffd1;
+      border-radius: 12px;
+      padding: 0.8rem 1rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #b3e9e0;
+      box-shadow:
+        inset 0 0 8px #00ffd1cc;
+      transition:
+        border-color 0.3s ease,
+        box-shadow 0.3s ease;
+    }
+    form#tradeForm select:hover,
+    form#tradeForm input[type=number]:hover,
+    form#tradeForm input[type=text]:hover {
+      border-color: #00fff8;
+      box-shadow:
+        inset 0 0 15px #00fff8cc;
+    }
+    form#tradeForm select:focus,
+    form#tradeForm input[type=number]:focus,
+    form#tradeForm input[type=text]:focus {
+      outline: none;
+      border-color: #00fff8;
+      box-shadow:
+        0 0 20px #00fff8aa;
+      background: #132239;
+      color: #d4fff9;
+    }
+    form#tradeForm button {
+      background: #00ffd1;
+      color: #0f2027;
+      font-weight: 900;
+      padding: 1rem 3rem;
+      font-size: 1.3rem;
+      border-radius: 15px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 10px 30px #00ffd1bb;
+      user-select: none;
+      flex: 0 0 auto;
+      align-self: center;
+      transition:
+        background 0.35s ease,
+        box-shadow 0.35s ease,
+        transform 0.15s ease;
+      letter-spacing: 0.12em;
+    }
+    form#tradeForm button:hover {
+      background: #00e8c3;
+      box-shadow: 0 14px 38px #00e8c3cc;
+      transform: translateY(-3px);
+    }
+    form#tradeForm button:active {
+      transform: translateY(1px);
+      box-shadow: 0 7px 20px #00d8b3aa;
+    }
+
+    /* Tables */
     .table-wrapper {
-      margin-bottom: 30px;
+      background: #152433cc;
+      border-radius: 20px;
+      padding: 1rem 1.5rem;
+      box-shadow:
+        0 0 15px #00ffd1aa;
+      overflow-x: auto;
+    }
+    .table-wrapper h2 {
+      margin-bottom: 1rem;
+      color: #00ffe7;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-shadow: 0 0 10px #00ffe7aa;
+      user-select: none;
     }
     table {
       width: 100%;
       border-collapse: collapse;
+      font-size: 0.95rem;
+      color: #c9faff;
+      user-select: none;
     }
-    table, th, td {
-      border: 1px solid #ddd;
+    thead tr {
+      background: #0f1c2b;
+      letter-spacing: 0.06em;
+      font-weight: 700;
+      text-align: center;
+      text-shadow: 0 0 8px #00e8c3cc;
     }
     th, td {
-      padding: 8px;
+      padding: 0.7rem 0.8rem;
+      border-bottom: 1px solid #002b3a;
+      border-right: 1px solid #002b3a;
+    }
+    th:last-child, td:last-child {
+      border-right: none;
+    }
+    tbody tr:hover {
+      background: #00ffd1aa;
+      color: #0f2027;
+      font-weight: 700;
+      transition: background 0.3s ease;
+    }
+    button.close-btn {
+      background: #ff4c4c;
+      border: none;
+      border-radius: 12px;
+      padding: 0.4rem 1rem;
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 15px #ff4c4caa;
+      transition:
+        background 0.25s ease,
+        box-shadow 0.25s ease,
+        transform 0.15s ease;
+      user-select: none;
+    }
+    button.close-btn:hover {
+      background: #ff1f1f;
+      box-shadow: 0 6px 20px #ff1f1faa;
+      transform: translateY(-2px);
+    }
+    button.close-btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 3px 10px #ff0f0faa;
+    }
+
+    /* Chart container */
+    .chart-container {
+      margin-top: 1.5rem;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow:
+        0 8px 30px #00ffd1bb;
+      background: #0f1927;
+      user-select: none;
+    }
+    .chart-container h2 {
+      color: #00ffd1;
       text-align: center;
+      font-weight: 700;
+      padding: 0.9rem 0;
+      text-shadow: 0 0 15px #00ffd1aa;
+      letter-spacing: 0.08em;
+      user-select: none;
     }
     .chart-container iframe {
       width: 100%;
-      height: 300px;
+      height: 320px;
       border: none;
     }
-    #accessContainer {
-      text-align: center;
-      margin-top: 100px;
-    }
-    #accessContainer input {
-      padding: 10px;
-      font-size: 18px;
-      border: 2px solid #007bff;
-      border-radius: 5px;
-      transition: 0.3s;
-    }
-    #accessContainer input:focus {
-      outline: none;
-      box-shadow: 0 0 5px #007bff;
-    }
-    #accessMessage {
-      color: red;
-      margin-top: 10px;
-      display: none;
-    }
-    @keyframes shake {
-      0% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      50% { transform: translateX(5px); }
-      75% { transform: translateX(-5px); }
-      100% { transform: translateX(0); }
+
+    /* Responsive */
+    @media (max-width: 680px) {
+      #accessContainer, #dashboard {
+        width: 90vw;
+        padding: 1.5rem 1.8rem;
+      }
+      form#tradeForm {
+        flex-direction: column;
+      }
+      form#tradeForm select,
+      form#tradeForm input[type=number],
+      form#tradeForm input[type=text],
+      form#tradeForm button {
+        width: 100%;
+      }
     }
   </style>
 </head>
@@ -100,8 +375,9 @@
     <div id="accessMessage"></div>
   </div>
 
-  <div id="dashboard" class="container" style="display:none">
+  <div id="dashboard" style="display:none;">
     <h1>📈 Trading Panel</h1>
+
     <div class="stats">
       <div class="stat-box"><h3>Saldo Awal</h3><span id="initialBalance">1250.00 USDc</span></div>
       <div class="stat-box"><h3>Saldo Akhir</h3><span id="finalBalance">1250.00 USDc</span></div>
@@ -114,18 +390,26 @@
     </div>
 
     <form id="tradeForm">
-      <select id="pair"><option value="XAUUSDc">XAUUSDc</option><option value="BTCUSDc">BTCUSDc</option></select>
-      <input type="number" step="0.01" id="lot" placeholder="Lot (e.g. 0.01)" required />
-      <select id="position"><option value="BUY">BUY</option><option value="SELL">SELL</option></select>
-      <input type="text" id="reason" placeholder="Alasan Entry" required />
-      <input type="number" step="0.01" id="entryPrice" placeholder="Harga Entry (xxxx.xx)" required />
-      <button type="submit">Tambah Posisi</button>
+      <select id="pair" title="Pilih pasangan trading">
+        <option value="XAUUSDc">XAUUSDc</option>
+        <option value="BTCUSDc">BTCUSDc</option>
+      </select>
+      <input type="number" step="0.01" id="lot" placeholder="Lot (e.g. 0.01)" required title="Masukkan lot"/>
+      <select id="position" title="Posisi BUY atau SELL">
+        <option value="BUY">BUY</option>
+        <option value="SELL">SELL</option>
+      </select>
+      <input type="text" id="reason" placeholder="Alasan Entry" required title="Alasan membuka posisi" />
+      <input type="number" step="0.01" id="entryPrice" placeholder="Harga Entry (xxxx.xx)" required title="Harga entry"/>
+      <button type="submit" title="Tambah posisi trading">Tambah Posisi</button>
     </form>
 
     <div class="table-wrapper">
       <h2>📌 Posisi Terbuka</h2>
       <table id="openTradesTable">
-        <thead><tr><th>Pair</th><th>Lot</th><th>Posisi</th><th>Entry</th><th>Alasan</th><th>Waktu</th><th>Action</th></tr></thead>
+        <thead>
+          <tr><th>Pair</th><th>Lot</th><th>Posisi</th><th>Entry</th><th>Alasan</th><th>Waktu</th><th>Action</th></tr>
+        </thead>
         <tbody id="openTradesBody"></tbody>
       </table>
     </div>
@@ -133,7 +417,9 @@
     <div class="table-wrapper">
       <h2>✅ History Trading</h2>
       <table id="tradeHistory">
-        <thead><tr><th>Pair</th><th>Lot</th><th>Posisi</th><th>Entry</th><th>Close</th><th>Pips</th><th>USDC</th><th>Waktu Entry</th><th>Waktu Close</th></tr></thead>
+        <thead>
+          <tr><th>Pair</th><th>Lot</th><th>Posisi</th><th>Entry</th><th>Close</th><th>Pips</th><th>USDC</th><th>Waktu Entry</th><th>Waktu Close</th></tr>
+        </thead>
         <tbody></tbody>
       </table>
     </div>
@@ -157,80 +443,137 @@
       const msg = document.getElementById('accessMessage');
       if (input === "VL") {
         document.getElementById('accessContainer').style.display = 'none';
-        document.getElementById('dashboard').style.display = 'block';
+        document.getElementById('dashboard').style.display = 'flex';
       } else {
         msg.textContent = "❌ Kode akses salah!";
         msg.style.display = "block";
-        msg.style.animation = "shake 0.3s";
-        setTimeout(() => { msg.style.animation = "none"; }, 300);
+        msg.style.animation = "shake 0.4s";
+        setTimeout(() => { msg.style.animation = ""; }, 400);
       }
     }
 
     document.getElementById("tradeForm").addEventListener("submit", function(e) {
       e.preventDefault();
+
       const pair = document.getElementById("pair").value;
       const lot = parseFloat(document.getElementById("lot").value);
       const position = document.getElementById("position").value;
-      const reason = document.getElementById("reason").value;
+      const reason = document.getElementById("reason").value.trim();
       const entryPrice = parseFloat(document.getElementById("entryPrice").value);
-      const time = new Date().toLocaleString();
+      const now = new Date().toLocaleString();
 
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${pair}</td>
-        <td>${lot.toFixed(2)}</td>
-        <td>${position}</td>
-        <td>${entryPrice.toFixed(2)}</td>
-        <td>${reason}</td>
-        <td>${time}</td>
-        <td><button class="close-btn">Tutup</button></td>
-      `;
-      row.querySelector("button").addEventListener("click", function() {
-        const closePrice = prompt("Masukkan harga close:");
-        if (closePrice === null) return;
-        const close = parseFloat(closePrice);
-        if (isNaN(close)) return alert("Harga tidak valid!");
+      if (isNaN(lot) || lot <= 0 || isNaN(entryPrice)) {
+        alert("Lot dan harga entry harus angka valid lebih dari 0.");
+        return;
+      }
+      if (!reason) {
+        alert("Alasan entry harus diisi.");
+        return;
+      }
 
-        const pips = (position === "BUY") ? (close - entryPrice) * 100 : (entryPrice - close) * 100;
-        const usdc = pips * lot;
-
-        totalTrades++;
-        totalPips += pips;
-        finalBalance += usdc;
-
-        if (usdc >= 0) winTrades++;
-        else lossTrades++;
-
-        updateStats();
-
-        const historyRow = document.createElement("tr");
-        historyRow.innerHTML = `
-          <td>${pair}</td>
-          <td>${lot.toFixed(2)}</td>
-          <td>${position}</td>
-          <td>${entryPrice.toFixed(2)}</td>
-          <td>${close.toFixed(2)}</td>
-          <td>${pips.toFixed(1)}</td>
-          <td>${usdc.toFixed(2)}</td>
-          <td>${time}</td>
-          <td>${new Date().toLocaleString()}</td>
-        `;
-        document.querySelector("#tradeHistory tbody").appendChild(historyRow);
-        row.remove();
-      });
-      document.getElementById("openTradesBody").appendChild(row);
+      addOpenTrade({ pair, lot, position, reason, entryPrice, time: now });
       this.reset();
     });
+
+    function addOpenTrade(trade) {
+      const tbody = document.getElementById("openTradesBody");
+      const tr = document.createElement("tr");
+
+      tr.innerHTML = `
+        <td>${trade.pair}</td>
+        <td>${trade.lot.toFixed(2)}</td>
+        <td>${trade.position}</td>
+        <td>${trade.entryPrice.toFixed(2)}</td>
+        <td>${trade.reason}</td>
+        <td>${trade.time}</td>
+        <td><button class="close-btn" onclick='closeTrade(this)'>Close</button></td>
+      `;
+
+      tbody.appendChild(tr);
+      totalTrades++;
+      updateStats();
+    }
+
+    function closeTrade(button) {
+      const row = button.closest("tr");
+      const cells = row.children;
+
+      const pair = cells[0].textContent;
+      const lot = parseFloat(cells[1].textContent);
+      const position = cells[2].textContent;
+      const entryPrice = parseFloat(cells[3].textContent);
+      const reason = cells[4].textContent;
+      const entryTime = cells[5].textContent;
+      const closeTime = new Date().toLocaleString();
+
+      let closePrice = prompt(`Tutup posisi ${pair} ${position} dengan harga (contoh: 1234.56):`);
+      if (closePrice === null) return; // batal
+      closePrice = parseFloat(closePrice);
+      if (isNaN(closePrice) || closePrice <= 0) {
+        alert("Harga tutup harus angka valid > 0");
+        return;
+      }
+
+      // Hitung pips & USDc sesuai posisi
+      let pips;
+      if (position === "BUY") {
+        pips = (closePrice - entryPrice) * 100; // misal pips dihitung 1 pips = 0.01 harga, dikali 100 untuk konversi (sesuaikan)
+      } else {
+        pips = (entryPrice - closePrice) * 100;
+      }
+      pips = parseFloat(pips.toFixed(2));
+
+      const usdPerPip = 0.1; // asumsi 1 pip = 0.1 USDc per lot (ubah sesuai kebutuhan)
+      let profit = pips * lot * usdPerPip;
+      profit = parseFloat(profit.toFixed(2));
+
+      // Update final balance
+      finalBalance += profit;
+
+      // Update win/loss
+      if (profit > 0) winTrades++;
+      else if (profit < 0) lossTrades++;
+
+      totalPips += pips;
+
+      // Pindah ke history
+      addTradeHistory({
+        pair, lot, position, entryPrice, closePrice,
+        pips, usd: profit, entryTime, closeTime
+      });
+
+      // Hapus row posisi terbuka
+      row.remove();
+      updateStats();
+    }
+
+    function addTradeHistory(trade) {
+      const tbody = document.querySelector("#tradeHistory tbody");
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${trade.pair}</td>
+        <td>${trade.lot.toFixed(2)}</td>
+        <td>${trade.position}</td>
+        <td>${trade.entryPrice.toFixed(2)}</td>
+        <td>${trade.closePrice.toFixed(2)}</td>
+        <td>${trade.pips}</td>
+        <td>${trade.usd.toFixed(2)}</td>
+        <td>${trade.entryTime}</td>
+        <td>${trade.closeTime}</td>
+      `;
+      tbody.appendChild(tr);
+    }
 
     function updateStats() {
       document.getElementById("initialBalance").textContent = initialBalance.toFixed(2) + " USDc";
       document.getElementById("finalBalance").textContent = finalBalance.toFixed(2) + " USDc";
+      document.getElementById("totalPips").textContent = totalPips.toFixed(2);
+      document.getElementById("totalUSDC").textContent = (finalBalance - initialBalance).toFixed(2);
       document.getElementById("totalTrades").textContent = totalTrades;
       document.getElementById("winTrades").textContent = winTrades;
       document.getElementById("lossTrades").textContent = lossTrades;
-      document.getElementById("totalPips").textContent = totalPips.toFixed(1);
-      document.getElementById("totalUSDC").textContent = (finalBalance - initialBalance).toFixed(2);
-      const winrate = totalTrades > 0 ? (winTrades / totalTrades) * 100 : 0;
+
+      let winrate = totalTrades > 0 ? ((winTrades / totalTrades) * 100) : 0;
       document.getElementById("winrate").textContent = winrate.toFixed(1) + "%";
     }
   </script>

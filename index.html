@@ -110,23 +110,28 @@
 
     <div id="analysis">Analisa Trading Harian: <span id="analysisText">-</span></div>
 
-    <form id="openTradeForm">
-      <h3>Tambah Posisi Terbuka</h3>
-      <select id="pair" required>
-  <option value="" disabled selected>Pilih Pair</option>
-  <option value="XAUUSD">XAUUSD</option>
-  <option value="BTCUSD">BTCUSD</option>
-</select>
+    <!-- Tambahkan ini di dalam form openTradeForm -->
+<form id="openTradeForm">
+  <h3>Tambah Posisi Terbuka</h3>
+  <select id="pair" required>
+    <option value="" disabled selected>Pilih Pair</option>
+    <option value="XAUUSD">XAUUSD</option>
+    <option value="BTCUSD">BTCUSD</option>
+  </select>
 
-      <input type="number" id="lot" step="0.01" min="0.01" required placeholder="Lot" />
-      <select id="position" required>
-        <option value="BUY">BUY</option>
-        <option value="SELL">SELL</option>
-      </select>
-      <input type="number" id="entryPrice" step="0.1" min="0" required placeholder="Harga Entry" />
-      <input type="text" id="reason" required placeholder="Alasan Entry" />
-      <button type="submit">Tambah</button>
-    </form>
+  <input type="number" id="lot" step="0.01" min="0.01" required placeholder="Lot" />
+  
+  <select id="position" required>
+    <option value="BUY">BUY</option>
+    <option value="SELL">SELL</option>
+  </select>
+
+  <!-- Step disesuaikan ke 0.01 -->
+  <input type="number" id="entryPrice" step="0.01" min="0" required placeholder="Harga Entry (2 angka koma)" />
+
+  <input type="text" id="reason" required placeholder="Alasan Entry" />
+  <button type="submit">Tambah</button>
+</form>
 
     <h3>Posisi Terbuka</h3>
     <table id="openTradesTable">
@@ -380,21 +385,31 @@ loginForm.addEventListener("submit",e=>{
   }
 });
 
-openTradeForm.addEventListener("submit", e=>{
+openTradeForm.addEventListener("submit", e => {
   e.preventDefault();
-  const pair=document.getElementById("pair").value.trim().toUpperCase();
-  const lot=parseFloat(document.getElementById("lot").value);
-  const position=document.getElementById("position").value;
-  const entryPrice=parseFloat(document.getElementById("entryPrice").value);
-  const reason=document.getElementById("reason").value.trim();
-  const entryTime=new Date().toLocaleString();
+  const pair = document.getElementById("pair").value.trim().toUpperCase();
+  const lot = parseFloat(document.getElementById("lot").value);
+  const position = document.getElementById("position").value;
 
-  const newTrade={ pair, lot, position, entryPrice, reason, time:entryTime };
+  const entryPriceRaw = document.getElementById("entryPrice").value.trim();
+  
+  // Validasi 2 angka di belakang koma
+  if (!/^\d+(\.\d{1,2})?$/.test(entryPriceRaw)) {
+    alert("Harga Entry harus maksimal 2 angka di belakang koma.");
+    return;
+  }
+
+  const entryPrice = parseFloat(entryPriceRaw);
+  const reason = document.getElementById("reason").value.trim();
+  const entryTime = new Date().toLocaleString();
+
+  const newTrade = { pair, lot, position, entryPrice, reason, time: entryTime };
   openTrades.push(newTrade);
   addOpenTradeRow(newTrade);
   saveUserData();
   openTradeForm.reset();
 });
+
 </script>
 </body>
 </html>

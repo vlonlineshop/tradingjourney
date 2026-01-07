@@ -9,7 +9,6 @@
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-messaging-compat.js"></script>
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -55,18 +54,17 @@
         </header>
 
         <main class="space-y-6">
-            <!-- Subscription Banner -->
-            <div id="subscriptionBanner" class="bg-gradient-to-r from-primary to-secondary rounded-xl p-4 text-white">
+            <!-- WhatsApp Banner -->
+            <div class="bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl p-4 text-white">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h3 class="font-bold mb-1">Dapatkan Notifikasi</h3>
+                        <h3 class="font-bold mb-1">Gabung Grup WhatsApp</h3>
                         <p class="text-white/90 text-sm">Info promo dan update terbaru</p>
                     </div>
-                    <button id="subscribeBtn" class="bg-white text-primary px-4 py-2 rounded-lg text-sm font-medium">
-                        <i class="fas fa-bell mr-1"></i>Aktifkan
+                    <button onclick="joinWhatsApp()" class="bg-white text-green-600 hover:bg-green-50 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                        <i class="fab fa-whatsapp mr-1"></i>Gabung
                     </button>
                 </div>
-                <p id="subscribeStatus" class="text-white/80 text-xs mt-2 hidden"></p>
             </div>
 
             <!-- Loading -->
@@ -253,9 +251,9 @@
         // Initialize Firebase
         const app = firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        let messaging = null;
-        let currentFCMToken = null;
-        let isSubscribed = false;
+
+        // WhatsApp Group Link - GANTI DENGAN LINK GRUP WHATSAPP ANDA
+        const WHATSAPP_GROUP_LINK = "https://chat.whatsapp.com/XXXXXXXXXXXX";
 
         // Get invoice from URL
         const urlParams = new URLSearchParams(window.location.search);
@@ -269,180 +267,13 @@
         let invoiceAlreadyRated = false;
         let allReviews = [];
 
-        // Initialize FCM
-        async function initFCM() {
-            if (!firebase.messaging.isSupported()) {
-                console.log('FCM not supported in this browser');
-                return;
-            }
-
-            messaging = firebase.messaging();
+        // Join WhatsApp Group
+        function joinWhatsApp() {
+            // Buka link WhatsApp di tab baru
+            window.open(WHATSAPP_GROUP_LINK, '_blank');
             
-            // Request permission and get token
-            try {
-                // Use VAPID key from Firebase Console
-                const vapidKey = "BEl62eicp6y0RwQJ0pBq0e7VvXnHfZ8QKXvQ7Vc6Yq8p9rLmNzWqXwYtUvXyZ0aBcDeFgHiJkLmNoPqRsTuVwXyZ"; // Replace with your VAPID key
-                
-                const token = await messaging.getToken({ vapidKey });
-                if (token) {
-                    currentFCMToken = token;
-                    console.log('FCM Token:', token);
-                    
-                    // Check if already subscribed
-                    await checkSubscriptionStatus(token);
-                }
-            } catch (error) {
-                console.log('Error getting FCM token:', error);
-            }
-        }
-
-        // Check subscription status
-        async function checkSubscriptionStatus(token) {
-            try {
-                const tokenDoc = await db.collection('fcm_tokens').doc(token).get();
-                
-                if (tokenDoc.exists) {
-                    isSubscribed = true;
-                    updateSubscribeUI(true);
-                    console.log('User is already subscribed');
-                }
-            } catch (error) {
-                console.error('Error checking subscription:', error);
-            }
-        }
-
-        // Save FCM token to Firebase
-        async function saveFCMToken() {
-            if (!currentFCMToken) {
-                showSubscribeStatus('Gagal mendapatkan token notifikasi', 'error');
-                return;
-            }
-
-            try {
-                const tokenData = {
-                    token: currentFCMToken,
-                    subscribedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    lastActive: firebase.firestore.FieldValue.serverTimestamp(),
-                    platform: 'web',
-                    source: 'rating_page',
-                    isActive: true,
-                    userAgent: navigator.userAgent,
-                    language: navigator.language,
-                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                    invoiceNumber: invoiceNumber || null,
-                    pageUrl: window.location.href,
-                    // Device info
-                    browser: getBrowserName(),
-                    os: getOS(),
-                    screenResolution: `${window.screen.width}x${window.screen.height}`
-                };
-
-                // Save token with token as document ID
-                await db.collection('fcm_tokens').doc(currentFCMToken).set(tokenData, { merge: true });
-                
-                isSubscribed = true;
-                updateSubscribeUI(true);
-                showSubscribeStatus('Notifikasi berhasil diaktifkan!', 'success');
-                
-                console.log('FCM token saved successfully');
-                
-            } catch (error) {
-                console.error('Error saving FCM token:', error);
-                showSubscribeStatus('Gagal menyimpan token', 'error');
-            }
-        }
-
-        // Update subscription UI
-        function updateSubscribeUI(subscribed) {
-            const btn = document.getElementById('subscribeBtn');
-            const banner = document.getElementById('subscriptionBanner');
-            
-            if (subscribed) {
-                btn.innerHTML = '<i class="fas fa-bell-slash mr-1"></i>Nonaktifkan';
-                btn.classList.remove('bg-white', 'text-primary');
-                btn.classList.add('bg-green-500', 'text-white');
-                banner.classList.add('bg-gradient-to-r', 'from-green-500', 'to-emerald-600');
-                banner.classList.remove('bg-gradient-to-r', 'from-primary', 'to-secondary');
-            } else {
-                btn.innerHTML = '<i class="fas fa-bell mr-1"></i>Aktifkan';
-                btn.classList.remove('bg-green-500', 'text-white');
-                btn.classList.add('bg-white', 'text-primary');
-                banner.classList.remove('bg-gradient-to-r', 'from-green-500', 'to-emerald-600');
-                banner.classList.add('bg-gradient-to-r', 'from-primary', 'to-secondary');
-            }
-        }
-
-        // Show subscription status
-        function showSubscribeStatus(message, type) {
-            const statusEl = document.getElementById('subscribeStatus');
-            statusEl.textContent = message;
-            statusEl.className = `text-xs mt-2 ${type === 'success' ? 'text-green-300' : 'text-red-300'}`;
-            statusEl.classList.remove('hidden');
-            
-            setTimeout(() => {
-                statusEl.classList.add('hidden');
-            }, 3000);
-        }
-
-        // Handle subscription button click
-        async function handleSubscribe() {
-            if (isSubscribed) {
-                // Unsubscribe logic (optional)
-                isSubscribed = false;
-                updateSubscribeUI(false);
-                showSubscribeStatus('Notifikasi dinonaktifkan', 'success');
-                return;
-            }
-
-            if (!('Notification' in window)) {
-                showSubscribeStatus('Browser tidak mendukung notifikasi', 'error');
-                return;
-            }
-
-            if (Notification.permission === 'denied') {
-                showSubscribeStatus('Izin notifikasi ditolak. Silakan aktifkan di pengaturan browser.', 'error');
-                return;
-            }
-
-            if (Notification.permission === 'granted') {
-                // Already have permission, just save token
-                if (!currentFCMToken) {
-                    await initFCM();
-                }
-                await saveFCMToken();
-                return;
-            }
-
-            // Request permission
-            const permission = await Notification.requestPermission();
-            
-            if (permission === 'granted') {
-                // Initialize FCM and save token
-                await initFCM();
-                await saveFCMToken();
-            } else {
-                showSubscribeStatus('Izin notifikasi ditolak', 'error');
-            }
-        }
-
-        // Helper functions for device info
-        function getBrowserName() {
-            const userAgent = navigator.userAgent;
-            if (userAgent.includes('Chrome')) return 'Chrome';
-            if (userAgent.includes('Firefox')) return 'Firefox';
-            if (userAgent.includes('Safari')) return 'Safari';
-            if (userAgent.includes('Edge')) return 'Edge';
-            return 'Unknown';
-        }
-
-        function getOS() {
-            const userAgent = navigator.userAgent;
-            if (userAgent.includes('Windows')) return 'Windows';
-            if (userAgent.includes('Mac')) return 'macOS';
-            if (userAgent.includes('Linux')) return 'Linux';
-            if (userAgent.includes('Android')) return 'Android';
-            if (userAgent.includes('iOS')) return 'iOS';
-            return 'Unknown';
+            // Tidak ada konfirmasi, tidak ada status, langsung redirect saja
+            // Tidak perlu menyimpan status di localStorage
         }
 
         // Format currency
@@ -462,9 +293,6 @@
 
         // Initialize App
         async function initApp() {
-            // Initialize FCM
-            await initFCM();
-            
             hideLoading();
             
             // Always show stats section
@@ -741,9 +569,6 @@
         document.addEventListener('DOMContentLoaded', () => {
             // Initialize app
             initApp();
-
-            // Subscription button
-            document.getElementById('subscribeBtn').addEventListener('click', handleSubscribe);
 
             // Rating stars
             document.querySelectorAll('.star').forEach(star => {

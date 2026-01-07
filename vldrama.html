@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VLDrama - Streaming Drama Terbaik</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .hero-gradient {
+            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.1) 100%);
+        }
+        
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+        
+        .nav-gradient {
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, transparent 100%);
+        }
+        
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        .play-button {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .loading-spinner {
+            border-top-color: #e50914;
+            animation: spinner 0.8s linear infinite;
+        }
+        
+        @keyframes spinner {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 50;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+        }
+        
+        .line-clamp-1 {
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 1;
+        }
+        
+        .line-clamp-2 {
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+        }
+        
+        .line-clamp-3 {
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 3;
+        }
+    </style>
+</head>
+<body class="bg-black text-white">
+    <!-- Navbar -->
+    <nav class="fixed w-full z-40 nav-gradient py-4 px-4 md:px-8 transition-all duration-300">
+        <div class="flex justify-between items-center">
+            <div class="flex items-center space-x-10">
+                <a href="#" class="text-red-600 font-bold text-2xl md:text-3xl">VLDrama</a>
+                <div class="hidden md:flex space-x-6">
+                    <a href="#" class="hover:text-gray-300 transition-colors">Beranda</a>
+                    <a href="#trending" class="hover:text-gray-300 transition-colors">Trending</a>
+                    <a href="#latest" class="hover:text-gray-300 transition-colors">Terbaru</a>
+                    <a href="#dubindo" class="hover:text-gray-300 transition-colors">Dub Indo</a>
+                    <a href="#vip" class="text-yellow-400 hover:text-yellow-300 transition-colors">VIP</a>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-4 md:space-x-6">
+                <div class="relative hidden md:block">
+                    <input type="text" id="searchInput" placeholder="Cari drama..." class="bg-gray-800 text-white px-4 py-2 rounded-md w-64 focus:outline-none focus:ring-2 focus:ring-red-600">
+                    <button id="searchButton" class="absolute right-2 top-2 text-gray-400 hover:text-white">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center">
+                        <span class="font-bold">U</span>
+                    </div>
+                    <span class="hidden md:inline">User</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Search -->
+        <div class="md:hidden mt-4">
+            <div class="relative">
+                <input type="text" id="mobileSearchInput" placeholder="Cari drama..." class="bg-gray-800 text-white px-4 py-2 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-red-600">
+                <button id="mobileSearchButton" class="absolute right-2 top-2 text-gray-400 hover:text-white">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative h-screen md:h-[90vh] flex items-center">
+        <div class="absolute inset-0 z-0">
+            <div id="heroBackground" class="w-full h-full bg-gradient-to-r from-purple-900 to-blue-900"></div>
+            <div class="absolute inset-0 hero-gradient"></div>
+        </div>
+        
+        <div class="relative z-10 px-4 md:px-12 max-w-3xl">
+            <h1 id="heroTitle" class="text-4xl md:text-6xl font-bold mb-4">VLDrama</h1>
+            <p id="heroDescription" class="text-lg md:text-xl mb-6 text-gray-200">Streaming drama terbaik dari berbagai negara dengan kualitas terbaik</p>
+            <div class="flex space-x-4">
+                <button id="playButton" class="bg-white text-black px-6 py-3 rounded-md font-semibold hover:bg-gray-200 transition-colors flex items-center space-x-2">
+                    <i class="fas fa-play"></i>
+                    <span>Putar Sekarang</span>
+                </button>
+                <button id="infoButton" class="bg-gray-700 bg-opacity-70 text-white px-6 py-3 rounded-md font-semibold hover:bg-opacity-90 transition-colors flex items-center space-x-2">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Info Selengkapnya</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="px-4 md:px-8 pb-16 -mt-20 md:-mt-40 relative z-20">
+        
+        <!-- For You Section -->
+        <section class="mb-12">
+            <h2 class="text-xl md:text-2xl font-bold mb-4">Rekomendasi Untukmu</h2>
+            <div id="foryouContainer" class="flex space-x-4 overflow-x-auto scrollbar-hide pb-4">
+                <!-- Data will be loaded from API -->
+                <div class="flex-shrink-0 w-48 md:w-64 rounded-lg overflow-hidden bg-gray-800 animate-pulse">
+                    <div class="h-64 md:h-80 bg-gray-700"></div>
+                    <div class="p-4">
+                        <div class="h-4 bg-gray-700 rounded mb-2"></div>
+                        <div class="h-3 bg-gray-700 rounded w-3/4"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Trending Section -->
+        <section id="trending" class="mb-12">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl md:text-2xl font-bold">Drama Trending</h2>
+                <a href="#" class="text-red-500 hover:text-red-400 text-sm md:text-base">Lihat Semua</a>
+            </div>
+            <div id="trendingContainer" class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <!-- Data will be loaded from API -->
+                <div class="rounded-lg overflow-hidden bg-gray-800 animate-pulse">
+                    <div class="h-40 md:h-56 bg-gray-700"></div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Latest Section -->
+        <section id="latest" class="mb-12">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl md:text-2xl font-bold">Drama Terbaru</h2>
+                <a href="#" class="text-red-500 hover:text-red-400 text-sm md:text-base">Lihat Semua</a>
+            </div>
+            <div id="latestContainer" class="flex space-x-4 overflow-x-auto scrollbar-hide pb-4">
+                <!-- Data will be loaded from API -->
+                <div class="flex-shrink-0 w-48 md:w-56 rounded-lg overflow-hidden bg-gray-800 animate-pulse">
+                    <div class="h-64 md:h-72 bg-gray-700"></div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Dub Indo Section -->
+        <section id="dubindo" class="mb-12">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl md:text-2xl font-bold">Dubbing Indonesia</h2>
+                <a href="#" class="text-red-500 hover:text-red-400 text-sm md:text-base">Lihat Semua</a>
+            </div>
+            <div id="dubindoContainer" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                <!-- Data will be loaded from API -->
+                <div class="rounded-lg overflow-hidden bg-gray-800 animate-pulse">
+                    <div class="h-40 md:h-48 bg-gray-700"></div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- VIP Section -->
+        <section id="vip" class="mb-12">
+            <div class="bg-gradient-to-r from-red-900 via-red-800 to-red-900 rounded-xl p-6 md:p-8">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="mb-6 md:mb-0 md:mr-8">
+                        <h2 class="text-2xl md:text-3xl font-bold mb-2">Akses Konten VIP</h2>
+                        <p class="text-gray-200 mb-4">Nikmati drama eksklusif tanpa iklan dengan kualitas tertinggi. Berlangganan sekarang dan dapatkan akses ke semua konten premium.</p>
+                        <button class="bg-yellow-500 text-black px-6 py-3 rounded-md font-bold hover:bg-yellow-400 transition-colors">
+                            Berlangganan Sekarang
+                        </button>
+                    </div>
+                    <div class="flex space-x-4">
+                        <div class="text-center">
+                            <div class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-yellow-500 flex items-center justify-center mx-auto mb-2">
+                                <i class="fas fa-crown text-2xl md:text-3xl text-black"></i>
+                            </div>
+                            <p class="font-semibold">No Ads</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-yellow-500 flex items-center justify-center mx-auto mb-2">
+                                <i class="fas fa-hd text-2xl md:text-3xl text-black"></i>
+                            </div>
+                            <p class="font-semibold">4K Quality</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-yellow-500 flex items-center justify-center mx-auto mb-2">
+                                <i class="fas fa-play-circle text-2xl md:text-3xl text-black"></i>
+                            </div>
+                            <p class="font-semibold">Early Access</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Random Drama Section -->
+        <section class="mb-12">
+            <h2 class="text-xl md:text-2xl font-bold mb-4">Drama Acak</h2>
+            <div id="randomContainer" class="rounded-xl overflow-hidden relative h-64 md:h-80 cursor-pointer">
+                <div class="absolute inset-0 bg-gradient-to-r from-black to-transparent z-10"></div>
+                <img id="randomImage" src="" alt="Random Drama" class="w-full h-full object-cover">
+                <div class="absolute inset-0 z-20 flex items-center px-6 md:px-12">
+                    <div class="max-w-xl">
+                        <h3 id="randomTitle" class="text-2xl md:text-4xl font-bold mb-2 line-clamp-1"></h3>
+                        <p id="randomDesc" class="text-gray-200 mb-4 line-clamp-2"></p>
+                        <button id="randomButton" class="bg-red-600 text-white px-6 py-3 rounded-md font-semibold hover:bg-red-700 transition-colors flex items-center space-x-2">
+                            <i class="fas fa-random"></i>
+                            <span>Acak Drama Lainnya</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Popular Search Section -->
+        <section class="mb-12">
+            <h2 class="text-xl md:text-2xl font-bold mb-4">Pencarian Populer</h2>
+            <div id="popularSearchContainer" class="flex flex-wrap gap-3">
+                <!-- Data will be loaded from API -->
+                <div class="px-4 py-2 bg-gray-800 rounded-full animate-pulse">
+                    <div class="h-4 w-24 bg-gray-700 rounded"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 px-6 md:px-12 py-8">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-6 md:mb-0">
+                <a href="#" class="text-red-600 font-bold text-2xl mb-4 inline-block">VLDrama</a>
+                <p class="max-w-md">Platform streaming drama terlengkap dengan kualitas terbaik. Nikmati berbagai genre drama dari berbagai negara dengan subtitle berkualitas.</p>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-8 md:gap-16">
+                <div>
+                    <h3 class="text-white font-bold mb-4">Kategori</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-white transition-colors">Romantis</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Komedi</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Drama</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Fantasi</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-white font-bold mb-4">Bantuan</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-white transition-colors">Pusat Bantuan</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">FAQ</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Kontak Kami</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Ketentuan Layanan</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-white font-bold mb-4">Ikuti Kami</h3>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors text-xl">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors text-xl">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors text-xl">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors text-xl">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="border-t border-gray-800 mt-8 pt-6 text-center">
+            <p>&copy; 2023 VLDrama. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Detail Modal -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content w-full h-full overflow-auto">
+            <div class="container mx-auto px-4 py-8">
+                <button id="closeModal" class="text-white text-3xl absolute top-4 right-6 hover:text-red-500">&times;</button>
+                <div id="modalContent" class="pt-10">
+                    <!-- Modal content will be loaded from API -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50">
+        <div class="text-center">
+            <div class="w-16 h-16 border-4 border-gray-700 border-t-red-600 rounded-full loading-spinner mx-auto mb-4"></div>
+            <p class="text-xl font-semibold">Memuat data...</p>
+        </div>
+    </div>
+
+    <script>
+        // API Configuration
+        const BASE_URL = 'https://drambox.sansekai.my.id/api';
+        
+        // DOM Elements
+        const foryouContainer = document.getElementById('foryouContainer');
+        const trendingContainer = document.getElementById('trendingContainer');
+        const latestContainer = document.getElementById('latestContainer');
+        const dubindoContainer = document.getElementById('dubindoContainer');
+        const randomContainer = document.getElementById('randomContainer');
+        const randomButton = document.getElementById('randomButton');
+        const randomImage = document.getElementById('randomImage');
+        const randomTitle = document.getElementById('randomTitle');
+        const randomDesc = document.getElementById('randomDesc');
+        const popularSearchContainer = document.getElementById('popularSearchContainer');
+        const searchInput = document.getElementById('searchInput');
+        const mobileSearchInput = document.getElementById('mobileSearchInput');
+        const searchButton = document.getElementById('searchButton');
+        const mobileSearchButton = document.getElementById('mobileSearchButton');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const detailModal = document.getElementById('detailModal');
+        const modalContent = document.getElementById('modalContent');
+        const closeModal = document.getElementById('closeModal');
+        const heroTitle = document.getElementById('heroTitle');
+        const heroDescription = document.getElementById('heroDescription');
+        const heroBackground = document.getElementById('heroBackground');
+        const playButton = document.getElementById('playButton');
+        const infoButton = document.getElementById('infoButton');
+
+        // Cache for API responses
+        let apiCache = {
+            foryou: null,
+            trending: null,
+            latest: null,
+            dubindo: null,
+            random: null,
+            popularSearch: null,
+            detail: {}
+        };
+
+        // Function to show loading
+        function showLoading() {
+            loadingOverlay.style.display = 'flex';
+        }
+
+        // Function to hide loading
+        function hideLoading() {
+            loadingOverlay.style.display = 'none';
+        }
+
+        // Function to handle API errors
+        function handleApiError(section, error) {
+            console.error(`Error loading ${section}:`, error);
+            const container = document.getElementById(`${section}Container`);
+            if (container) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-8">
+                        <i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
+                        <p class="text-gray-400">Gagal memuat data. Silakan refresh halaman.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Function to fetch data from API
+        async function fetchFromAPI(endpoint) {
+            try {
+                const response = await fetch(`${BASE_URL}${endpoint}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('API Error:', error);
+                throw error;
+            }
+        }
+
+        // Function to render drama cards
+        function renderDramaCards(container, data, type = 'default') {
+            if (!data || data.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-8">
+                        <p class="text-gray-400">Tidak ada data ditemukan.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            
+            data.forEach((item, index) => {
+                const card = document.createElement('div');
+                
+                let cardClass = '';
+                let content = '';
+                
+                switch(type) {
+                    case 'foryou':
+                        cardClass = 'flex-shrink-0 w-48 md:w-64 rounded-lg overflow-hidden bg-gray-800 card-hover cursor-pointer';
+                        content = `
+                            <div class="relative">
+                                <img src="${item.thumbnail || 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'}" 
+                                     alt="${item.title || 'Drama'}" 
+                                     class="w-full h-64 md:h-80 object-cover">
+                                <div class="absolute top-2 right-2 bg-black bg-opacity-70 px-2 py-1 rounded text-sm">
+                                    <i class="fas fa-star text-yellow-400 mr-1"></i>${item.rating || '8.0'}
+                                </div>
+                                <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
+                                    <h3 class="font-bold text-lg line-clamp-1">${item.title || 'Judul Drama'}</h3>
+                                    <p class="text-gray-300 text-sm line-clamp-1">${item.genre || 'Drama'}</p>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'trending':
+                        cardClass = 'rounded-lg overflow-hidden bg-gray-800 card-hover cursor-pointer';
+                        content = `
+                            <div class="relative">
+                                <img src="${item.thumbnail || 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'}" 
+                                     alt="${item.title || 'Drama'}" 
+                                     class="w-full h-40 md:h-56 object-cover">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                                    <h3 class="font-bold text-white line-clamp-1">${item.title || 'Judul Drama'}</h3>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'latest':
+                        cardClass = 'flex-shrink-0 w-48 md:w-56 rounded-lg overflow-hidden bg-gray-800 card-hover cursor-pointer';
+                        content = `
+                            <div class="relative">
+                                <img src="${item.thumbnail || 'https://images.unsplash.com/photo-1595769812725-4c6564f7528b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'}" 
+                                     alt="${item.title || 'Drama'}" 
+                                     class="w-full h-64 md:h-72 object-cover">
+                                <div class="absolute top-2 left-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">BARU</div>
+                                <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                                    <h3 class="font-bold text-white line-clamp-1">${item.title || 'Judul Drama'}</h3>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'dubindo':
+                        cardClass = 'rounded-lg overflow-hidden bg-gray-800 card-hover cursor-pointer';
+                        content = `
+                            <div class="relative">
+                                <img src="${item.thumbnail || 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'}" 
+                                     alt="${item.title || 'Drama'}" 
+                                     class="w-full h-40 md:h-48 object-cover">
+                                <div class="absolute top-2 left-2 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">DUB</div>
+                                <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
+                                    <h3 class="font-bold text-white text-sm line-clamp-1">${item.title || 'Judul Drama'}</h3>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                        
+                    default:
+                        cardClass = 'rounded-lg overflow-hidden bg-gray-800 card-hover cursor-pointer';
+                        content = `
+                            <div class="relative">
+                                <img src="${item.thumbnail || 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'}" 
+                                     alt="${item.title || 'Drama'}" 
+                                     class="w-full h-40 md:h-56 object-cover">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                                    <h3 class="font-bold text-white line-clamp-1">${item.title || 'Judul Drama'}</h3>
+                                </div>
+                            </div>
+                        `;
+                }
+                
+                card.className = cardClass;
+                card.innerHTML = content;
+                card.addEventListener('click', () => showDetail(item.id || index));
+                container.appendChild(card);
+            });
+        }
+
+        // Function to render popular search
+        function renderPopularSearch(data) {
+            if (!data || data.length === 0) {
+                popularSearchContainer.innerHTML = `
+                    <p class="text-gray-400">Tidak ada data pencarian populer.</p>
+                `;
+                return;
+            }
+
+            popularSearchContainer.innerHTML = '';
+            
+            data.forEach((item, index) => {
+                const badge = document.createElement('div');
+                badge.className = 'px-4 py-2 bg-gray-800 rounded-full hover:bg-gray-700 cursor-pointer transition-colors';
+                badge.textContent = item.query || item.title || `Pencarian ${index + 1}`;
+                badge.addEventListener('click', () => {
+                    searchInput.value = badge.textContent;
+                    mobileSearchInput.value = badge.textContent;
+                    performSearch(badge.textContent);
+                });
+                popularSearchContainer.appendChild(badge);
+            });
+        }
+
+        // Function to update random drama
+        async function updateRandomDrama() {
+            try {
+                showLoading();
+                const data = await fetchFromAPI('/drambox/randomdrama');
+                apiCache.random = data;
+                
+                if (data && data.title) {
+                    randomImage.src = data.thumbnail || 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
+                    randomTitle.textContent = data.title;
+                    randomDesc.textContent = data.description || data.genre || 'Drama terbaik untuk Anda';
+                    
+                    // Update hero section with random drama
+                    if (data.thumbnail) {
+                        heroBackground.innerHTML = `<img src="${data.thumbnail}" alt="${data.title}" class="w-full h-full object-cover">`;
+                    }
+                    heroTitle.textContent = data.title;
+                    heroDescription.textContent = data.description || 'Drama terbaik untuk Anda';
+                    
+                    // Update button events
+                    playButton.onclick = () => showDetail(data.id || 0);
+                    infoButton.onclick = () => showDetail(data.id || 0);
+                    randomContainer.onclick = () => showDetail(data.id || 0);
+                }
+            } catch (error) {
+                console.error('Error loading random drama:', error);
+                randomTitle.textContent = 'VLDrama';
+                randomDesc.textContent = 'Streaming drama terbaik dari berbagai negara';
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Function to show detail modal
+        async function showDetail(dramaId) {
+            try {
+                showLoading();
+                
+                // Check cache first
+                if (apiCache.detail[dramaId]) {
+                    renderDetailModal(apiCache.detail[dramaId]);
+                    hideLoading();
+                    return;
+                }
+                
+                // Fetch from API
+                const data = await fetchFromAPI(`/drambox/detail?id=${dramaId}`);
+                apiCache.detail[dramaId] = data;
+                
+                renderDetailModal(data);
+            } catch (error) {
+                console.error('Error loading detail:', error);
+                modalContent.innerHTML = `
+                    <div class="text-center py-12">
+                        <i class="fas fa-exclamation-triangle text-5xl text-red-500 mb-4"></i>
+                        <h2 class="text-2xl font-bold mb-2">Gagal Memuat Detail</h2>
+                        <p class="text-gray-400">Silakan coba lagi nanti.</p>
+                    </div>
+                `;
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Function to render detail modal
+        function renderDetailModal(data) {
+            modalContent.innerHTML = `
+                <div class="flex flex-col md:flex-row">
+                    <div class="md:w-1/3 mb-6 md:mb-0 md:mr-8">
+                        <img src="${data.thumbnail || 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'}" 
+                             alt="${data.title || 'Drama'}" 
+                             class="w-full rounded-lg">
+                    </div>
+                    <div class="md:w-2/3">
+                        <h2 class="text-3xl font-bold mb-4">${data.title || 'Judul Drama'}</h2>
+                        <div class="flex items-center mb-4">
+                            <div class="bg-yellow-500 text-black px-3 py-1 rounded-md font-bold mr-4">
+                                <i class="fas fa-star mr-1"></i>${data.rating || "8.5"}
+                            </div>
+                            <span class="bg-gray-700 px-3 py-1 rounded-md mr-2">HD</span>
+                            ${data.genre ? `<span class="bg-red-900 px-3 py-1 rounded-md">${data.genre.split(',')[0] || 'Drama'}</span>` : ''}
+                        </div>
+                        <p class="text-gray-300 mb-6">${data.description || 'Deskripsi drama akan muncul di sini. Lorem ipsum dolor sit amet, consectetur adipiscing elit.'}</p>
+                        
+                        <div class="mb-6">
+                            <h3 class="text-xl font-bold mb-2">Info</h3>
+                            <div class="grid grid-cols-2 gap-4">
+                                ${data.year ? `<div><span class="text-gray-400">Tahun:</span> ${data.year}</div>` : ''}
+                                ${data.country ? `<div><span class="text-gray-400">Negara:</span> ${data.country}</div>` : ''}
+                                ${data.episodes ? `<div><span class="text-gray-400">Episode:</span> ${data.episodes}</div>` : ''}
+                                ${data.duration ? `<div><span class="text-gray-400">Durasi:</span> ${data.duration}</div>` : ''}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <h3 class="text-xl font-bold mb-2">Genre</h3>
+                            <div class="flex flex-wrap gap-2">
+                                ${data.genre ? data.genre.split(',').map(g => `
+                                    <span class="bg-gray-800 px-3 py-1 rounded-md">${g.trim()}</span>
+                                `).join('') : '<span class="bg-gray-800 px-3 py-1 rounded-md">Drama</span>'}
+                            </div>
+                        </div>
+                        
+                        <div class="flex space-x-4">
+                            <button class="bg-red-600 text-white px-6 py-3 rounded-md font-bold hover:bg-red-700 transition-colors flex items-center">
+                                <i class="fas fa-play mr-2"></i> Putar Sekarang
+                            </button>
+                            <button class="bg-gray-700 text-white px-6 py-3 rounded-md font-bold hover:bg-gray-600 transition-colors flex items-center">
+                                <i class="fas fa-plus mr-2"></i> Tambah ke Daftar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                ${data.episodes ? `
+                <div class="mt-12">
+                    <h3 class="text-2xl font-bold mb-4">Episode</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                        ${Array.from({length: Math.min(data.episodes, 10)}, (_, i) => `
+                            <div class="bg-gray-800 rounded-lg p-4 text-center cursor-pointer hover:bg-gray-700 transition-colors">
+                                <div class="text-lg font-bold mb-2">${i+1}</div>
+                                <div class="text-sm text-gray-400">Episode ${i+1}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                ` : ''}
+            `;
+            
+            detailModal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Function to perform search
+        async function performSearch(query) {
+            if (!query.trim()) {
+                alert('Silakan masukkan kata kunci pencarian');
+                return;
+            }
+            
+            try {
+                showLoading();
+                const data = await fetchFromAPI(`/drambox/search?q=${encodeURIComponent(query)}`);
+                
+                // Create modal for search results
+                modalContent.innerHTML = `
+                    <div>
+                        <h2 class="text-3xl font-bold mb-6">Hasil Pencarian: "${query}"</h2>
+                        ${data && data.length > 0 ? `
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                ${data.map(item => `
+                                    <div class="bg-gray-800 rounded-lg overflow-hidden card-hover cursor-pointer" onclick="showDetail(${item.id || 0})">
+                                        <img src="${item.thumbnail || 'https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'}" 
+                                             alt="${item.title}" 
+                                             class="w-full h-48 object-cover">
+                                        <div class="p-4">
+                                            <h3 class="font-bold line-clamp-1">${item.title}</h3>
+                                            <p class="text-gray-400 text-sm line-clamp-2">${item.description || item.genre || ''}</p>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : `
+                            <div class="text-center py-12">
+                                <i class="fas fa-search text-5xl text-gray-500 mb-4"></i>
+                                <h3 class="text-xl font-bold mb-2">Tidak Ditemukan</h3>
+                                <p class="text-gray-400">Tidak ada drama yang cocok dengan pencarian Anda.</p>
+                            </div>
+                        `}
+                    </div>
+                `;
+                
+                detailModal.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            } catch (error) {
+                console.error('Search error:', error);
+                alert('Gagal melakukan pencarian. Silakan coba lagi.');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Function to load all data from APIs
+        async function loadAllData() {
+            showLoading();
+            
+            try {
+                // Load all data concurrently
+                const [
+                    foryouData,
+                    trendingData,
+                    latestData,
+                    dubindoData,
+                    popularSearchData
+                ] = await Promise.allSettled([
+                    fetchFromAPI('/drambox/foryou'),
+                    fetchFromAPI('/drambox/trending'),
+                    fetchFromAPI('/drambox/latest'),
+                    fetchFromAPI('/drambox/dubindo'),
+                    fetchFromAPI('/drambox/populersearch')
+                ]);
+                
+                // Process each response
+                if (foryouData.status === 'fulfilled') {
+                    apiCache.foryou = foryouData.value;
+                    renderDramaCards(foryouContainer, foryouData.value, 'foryou');
+                } else {
+                    handleApiError('foryou', foryouData.reason);
+                }
+                
+                if (trendingData.status === 'fulfilled') {
+                    apiCache.trending = trendingData.value;
+                    renderDramaCards(trendingContainer, trendingData.value, 'trending');
+                } else {
+                    handleApiError('trending', trendingData.reason);
+                }
+                
+                if (latestData.status === 'fulfilled') {
+                    apiCache.latest = latestData.value;
+                    renderDramaCards(latestContainer, latestData.value, 'latest');
+                } else {
+                    handleApiError('latest', latestData.reason);
+                }
+                
+                if (dubindoData.status === 'fulfilled') {
+                    apiCache.dubindo = dubindoData.value;
+                    renderDramaCards(dubindoContainer, dubindoData.value, 'dubindo');
+                } else {
+                    handleApiError('dubindo', dubindoData.reason);
+                }
+                
+                if (popularSearchData.status === 'fulfilled') {
+                    apiCache.popularSearch = popularSearchData.value;
+                    renderPopularSearch(popularSearchData.value);
+                } else {
+                    popularSearchContainer.innerHTML = `
+                        <p class="text-gray-400">Gagal memuat pencarian populer.</p>
+                    `;
+                }
+                
+                // Load random drama
+                await updateRandomDrama();
+                
+            } catch (error) {
+                console.error('Error loading all data:', error);
+                alert('Gagal memuat data. Silakan refresh halaman.');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Event Listeners
+        randomButton.addEventListener('click', updateRandomDrama);
+        
+        searchButton.addEventListener('click', () => {
+            performSearch(searchInput.value);
+        });
+        
+        mobileSearchButton.addEventListener('click', () => {
+            performSearch(mobileSearchInput.value);
+        });
+        
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                performSearch(searchInput.value);
+            }
+        });
+        
+        mobileSearchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                performSearch(mobileSearchInput.value);
+            }
+        });
+        
+        closeModal.addEventListener('click', () => {
+            detailModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        });
+        
+        window.addEventListener('click', (e) => {
+            if (e.target === detailModal) {
+                detailModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', loadAllData);
+    </script>
+</body>
+</html>

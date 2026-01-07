@@ -3,317 +3,370 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Review - VLCrave Delivery</title>
+    <title>Rating VLCrave Delivery</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome -->
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-messaging-compat.js"></script>
+    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        primary: '#FF6B35',
-                        'primary-dark': '#E55A2B',
-                        secondary: '#FFA726',
-                        accent: '#FF4081',
-                        light: '#FFF3E0',
-                        dark: '#333333',
-                        gray: '#666666',
-                        'light-gray': '#F5F5F5',
-                        success: '#4CAF50',
-                        warning: '#FF9800',
-                        error: '#F44336',
-                    },
-                    fontFamily: {
-                        'poppins': ['Poppins', 'sans-serif'],
+                        primary: '#8b5cf6',
+                        secondary: '#7c3aed',
+                        accent: '#ec4899',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        error: '#ef4444',
+                        'purple-light': '#f5f3ff',
+                        'pink-light': '#fdf2f8'
                     },
                     animation: {
-                        'float': 'float 20s infinite ease-in-out',
-                        'slide-in': 'slideIn 0.5s ease-out',
-                        'fade-in': 'fadeIn 0.8s ease-out',
+                        'fade-in': 'fadeIn 0.5s ease-in',
                         'slide-up': 'slideUp 0.3s ease-out',
-                        'pulse-slow': 'pulse 2s infinite',
-                        'bounce-slow': 'bounce 1.5s infinite',
+                        'slide-left': 'slideLeft 0.4s ease-out'
                     },
                     keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translate(0, 0) rotate(0deg)' },
-                            '25%': { transform: 'translate(20px, 20px) rotate(90deg)' },
-                            '50%': { transform: 'translate(0, 40px) rotate(180deg)' },
-                            '75%': { transform: 'translate(-20px, 20px) rotate(270deg)' },
-                        },
-                        slideIn: {
-                            '0%': { transform: 'translateX(-100px)', opacity: '0' },
-                            '100%': { transform: 'translateX(0)', opacity: '1' },
-                        },
-                        slideUp: {
-                            '0%': { transform: 'translateY(20px)', opacity: '0' },
-                            '100%': { transform: 'translateY(0)', opacity: '1' },
-                        }
-                    },
-                    boxShadow: {
-                        'soft': '0 10px 30px rgba(0, 0, 0, 0.08)',
-                        'medium': '0 15px 40px rgba(0, 0, 0, 0.12)',
-                        'hard': '0 20px 50px rgba(0, 0, 0, 0.15)',
-                        'orange-glow': '0 10px 30px rgba(255, 107, 53, 0.3)',
-                    },
-                    backgroundImage: {
-                        'gradient-orange': 'linear-gradient(135deg, #FF6B35 0%, #FFA726 100%)',
-                        'gradient-blue': 'linear-gradient(135deg, #2196F3 0%, #03A9F4 100%)',
-                        'gradient-green': 'linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%)',
-                        'gradient-purple': 'linear-gradient(135deg, #9C27B0 0%, #E91E63 100%)',
+                        fadeIn: { '0%': { opacity: 0 }, '100%': { opacity: 1 } },
+                        slideUp: { '0%': { transform: 'translateY(10px)', opacity: 0 }, '100%': { transform: 'translateY(0)', opacity: 1 } },
+                        slideLeft: { '0%': { transform: 'translateX(20px)', opacity: 0 }, '100%': { transform: 'translateX(0)', opacity: 1 } }
                     }
                 }
             }
         }
     </script>
+    
     <style>
-        .review-card {
-            transition: all 0.3s ease;
+        .star.selected { 
+            color: #fbbf24; 
+            animation: starPop 0.3s ease-out;
         }
-        
-        .review-card:hover {
-            transform: translateY(-5px);
+        @keyframes starPop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1.1); }
         }
-        
-        .stat-card {
-            transition: all 0.3s ease;
+        .btn-primary {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            transition: all 0.3s;
         }
-        
-        .stat-card:hover {
-            transform: translateY(-3px);
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
         }
-        
-        .activity-item {
-            transition: all 0.3s ease;
+        .quick-comment-btn {
+            flex-shrink: 0;
+            transition: all 0.3s;
+            border: 2px solid transparent;
         }
-        
-        .activity-item:hover {
-            transform: translateX(5px);
+        .quick-comment-btn:hover {
+            transform: translateY(-2px);
+            border-color: #8b5cf6;
         }
-        
-        .bar-fill {
-            transition: width 1s ease;
+        .quick-comment-btn.selected {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+            border-color: #8b5cf6;
         }
-        
-        /* Custom scrollbar */
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
+        .scroll-container {
+            scrollbar-width: thin;
+            scrollbar-color: #c7d2fe #f5f3ff;
         }
-        
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
+        .scroll-container::-webkit-scrollbar {
+            height: 6px;
         }
-        
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #FF6B35;
-            border-radius: 10px;
+        .scroll-container::-webkit-scrollbar-track {
+            background: #f5f3ff;
+            border-radius: 3px;
         }
-        
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #E55A2B;
+        .scroll-container::-webkit-scrollbar-thumb {
+            background: #c7d2fe;
+            border-radius: 3px;
+        }
+        .invoice-badge {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
         }
     </style>
 </head>
-<body class="font-poppins bg-gradient-to-br from-orange-50 to-amber-50 text-gray-800 min-h-screen p-4 md:p-6">
-    <!-- Floating Background Elements -->
-    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <div class="absolute w-32 h-32 md:w-48 md:h-48 rounded-full bg-gradient-to-br from-orange-200/20 to-amber-200/10 top-10 left-5 animate-float"></div>
-        <div class="absolute w-40 h-40 md:w-56 md:h-56 rounded-full bg-gradient-to-br from-orange-300/15 to-amber-300/5 top-1/2 right-10 animate-float animation-delay-[-5s]"></div>
-        <div class="absolute w-24 h-24 md:w-36 md:h-36 rounded-full bg-gradient-to-br from-orange-200/25 to-amber-200/15 bottom-20 left-20 animate-float animation-delay-[-10s]"></div>
-    </div>
-
-    <!-- Main Container -->
-    <div class="max-w-7xl mx-auto relative z-10">
+<body class="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 font-sans">
+    <div class="max-w-xl mx-auto p-4">
         <!-- Header -->
-        <header class="text-center mb-8 md:mb-12">
-            <div class="inline-flex items-center gap-4 md:gap-6 bg-white px-6 md:px-8 py-4 md:py-5 rounded-2xl shadow-hard mb-4 animate-slide-in hover:transform hover:-translate-y-1 transition-all duration-300">
-                <div class="bg-gradient-orange w-12 h-12 md:w-16 md:h-16 rounded-xl flex items-center justify-center text-white text-xl md:text-2xl">
-                    <i class="fas fa-chart-line"></i>
-                </div>
-                <h1 class="text-2xl md:text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                    Dashboard Review
-                </h1>
+        <header class="text-center mb-6 animate-fade-in">
+            <div class="inline-flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-gradient-to-br from-primary to-accent shadow-lg">
+                <i class="fas fa-star text-white text-2xl"></i>
             </div>
-            <p class="text-gray-600 text-base md:text-lg max-w-2xl mx-auto">
-                Pantau semua review dari pelanggan VLCrave Delivery
-            </p>
+            <h1 class="text-2xl font-bold text-gray-800 mb-1">Rating VLCrave Delivery</h1>
+            <p class="text-gray-600 text-sm">Beri rating untuk pengiriman Anda</p>
         </header>
 
-        <!-- Stats Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6 mb-8 md:mb-12">
-            <!-- Total Reviews -->
-            <div class="stat-card bg-white rounded-2xl p-5 md:p-6 shadow-soft hover:shadow-medium transition-all duration-300 relative overflow-hidden animate-slide-up">
-                <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-primary to-secondary"></div>
-                <div class="flex items-center gap-4 md:gap-5">
-                    <div class="bg-gradient-orange w-14 h-14 md:w-16 md:h-16 rounded-xl flex items-center justify-center text-white text-xl md:text-2xl">
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div>
-                        <p class="text-2xl md:text-3xl font-bold text-gray-800 mb-1" id="totalReviews">0</p>
-                        <p class="text-gray-600 text-sm md:text-base">Total Review</p>
-                    </div>
+        <main class="space-y-6">
+            <!-- Invoice Info Card -->
+            <div id="loading" class="text-center py-8">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary mb-3"></div>
+                <p class="text-gray-600">Memeriksa invoice...</p>
+            </div>
+
+            <!-- Invoice Not Found -->
+            <div id="invoiceNotFound" class="hidden bg-white rounded-xl p-6 text-center shadow-sm animate-slide-up">
+                <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-exclamation-triangle text-red-500"></i>
+                </div>
+                <h3 class="font-bold text-gray-800 mb-2">Invoice Tidak Ditemukan</h3>
+                <p class="text-gray-600 text-sm mb-4">Invoice <span id="invoiceNotFoundNumber" class="font-semibold">-</span> tidak ditemukan di sistem.</p>
+                <p class="text-gray-500 text-xs">Pastikan invoice sudah terdaftar di sistem VLCrave</p>
+            </div>
+
+            <!-- Already Rated -->
+            <div id="alreadyRated" class="hidden bg-white rounded-xl p-6 text-center shadow-sm animate-slide-up">
+                <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-check-circle text-success"></i>
+                </div>
+                <h3 class="font-bold text-gray-800 mb-2">Rating Sudah Dikirim</h3>
+                <p class="text-gray-600 text-sm mb-4">Invoice ini sudah mendapatkan rating.</p>
+                <div class="flex items-center justify-center gap-2 text-sm text-gray-500">
+                    <i class="fas fa-info-circle"></i>
+                    <span>1 invoice = 1 rating</span>
                 </div>
             </div>
 
-            <!-- Average Rating -->
-            <div class="stat-card bg-white rounded-2xl p-5 md:p-6 shadow-soft hover:shadow-medium transition-all duration-300 relative overflow-hidden animate-slide-up animation-delay-100">
-                <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-green-500 to-green-400"></div>
-                <div class="flex items-center gap-4 md:gap-5">
-                    <div class="bg-gradient-green w-14 h-14 md:w-16 md:h-16 rounded-xl flex items-center justify-center text-white text-xl md:text-2xl">
-                        <i class="fas fa-chart-bar"></i>
-                    </div>
-                    <div>
-                        <p class="text-2xl md:text-3xl font-bold text-gray-800 mb-1" id="avgRating">0.0</p>
-                        <p class="text-gray-600 text-sm md:text-base">Rating Rata-rata</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Customer Satisfaction -->
-            <div class="stat-card bg-white rounded-2xl p-5 md:p-6 shadow-soft hover:shadow-medium transition-all duration-300 relative overflow-hidden animate-slide-up animation-delay-200">
-                <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-blue-500 to-blue-400"></div>
-                <div class="flex items-center gap-4 md:gap-5">
-                    <div class="bg-gradient-blue w-14 h-14 md:w-16 md:h-16 rounded-xl flex items-center justify-center text-white text-xl md:text-2xl">
-                        <i class="fas fa-smile"></i>
-                    </div>
-                    <div>
-                        <p class="text-2xl md:text-3xl font-bold text-gray-800 mb-1" id="positiveReviews">0%</p>
-                        <p class="text-gray-600 text-sm md:text-base">Kepuasan Pelanggan</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Recent Reviews -->
-            <div class="stat-card bg-white rounded-2xl p-5 md:p-6 shadow-soft hover:shadow-medium transition-all duration-300 relative overflow-hidden animate-slide-up animation-delay-300">
-                <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-purple-500 to-pink-500"></div>
-                <div class="flex items-center gap-4 md:gap-5">
-                    <div class="bg-gradient-purple w-14 h-14 md:w-16 md:h-16 rounded-xl flex items-center justify-center text-white text-xl md:text-2xl">
-                        <i class="fas fa-history"></i>
-                    </div>
-                    <div>
-                        <p class="text-2xl md:text-3xl font-bold text-gray-800 mb-1" id="recentReviews">0</p>
-                        <p class="text-gray-600 text-sm md:text-base">Review Bulan Ini</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Main Content -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
-            <!-- Reviews Section -->
-            <div class="lg:col-span-2">
-                <div class="bg-white rounded-2xl md:rounded-3xl shadow-soft p-5 md:p-8">
-                    <!-- Header -->
-                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-0 mb-6 md:mb-8">
+            <!-- Invoice Details -->
+            <div id="invoiceDetails" class="hidden animate-slide-up">
+                <!-- Invoice Header -->
+                <div class="bg-white rounded-xl p-5 mb-4 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
                         <div class="flex items-center gap-3">
-                            <div class="bg-primary/10 p-2 rounded-lg">
-                                <i class="fas fa-comments text-primary text-lg md:text-xl"></i>
+                            <div class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
+                                <i class="fas fa-receipt text-primary"></i>
                             </div>
-                            <h2 class="text-xl md:text-2xl font-bold text-gray-800">Semua Review Pelanggan</h2>
+                            <div>
+                                <p class="text-gray-800 font-bold text-lg" id="invoiceNumber">-</p>
+                                <p class="text-gray-600 text-sm" id="invoiceDate">-</p>
+                            </div>
                         </div>
+                        <div class="px-3 py-1 invoice-badge text-white rounded-full text-sm font-medium">
+                            <span id="invoiceStatus">-</span>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="text-center">
+                            <p class="text-gray-600 text-sm mb-1">Total Pesanan</p>
+                            <p class="text-xl font-bold text-primary" id="invoiceTotal">-</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-gray-600 text-sm mb-1">Items</p>
+                            <p class="text-xl font-bold text-gray-800" id="invoiceItems">-</p>
+                        </div>
+                    </div>
+                </div>
 
-                        <!-- Filters -->
-                        <div class="flex flex-wrap gap-2 md:gap-3">
-                            <button class="filter-btn px-4 py-2 rounded-xl bg-primary text-white text-sm md:text-base font-medium transition-all duration-300 active" data-filter="all">
-                                Semua
+                <!-- Products -->
+                <div class="bg-white rounded-xl p-5 mb-6 shadow-sm">
+                    <h3 class="font-bold text-gray-800 mb-3">Detail Pesanan</h3>
+                    <div id="productsList" class="space-y-3"></div>
+                </div>
+
+                <!-- Rating Section -->
+                <div class="bg-white rounded-xl p-5 shadow-sm">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">Beri Rating Anda</h3>
+                    
+                    <!-- Stars -->
+                    <div class="text-center mb-6">
+                        <div class="flex justify-center gap-1 mb-3">
+                            <span class="star text-4xl cursor-pointer text-gray-200 hover:text-yellow-300" data-value="1">★</span>
+                            <span class="star text-4xl cursor-pointer text-gray-200 hover:text-yellow-300" data-value="2">★</span>
+                            <span class="star text-4xl cursor-pointer text-gray-200 hover:text-yellow-300" data-value="3">★</span>
+                            <span class="star text-4xl cursor-pointer text-gray-200 hover:text-yellow-300" data-value="4">★</span>
+                            <span class="star text-4xl cursor-pointer text-gray-200 hover:text-yellow-300" data-value="5">★</span>
+                        </div>
+                        <p id="ratingText" class="text-gray-600">Pilih rating 1-5 bintang</p>
+                    </div>
+
+                    <!-- Quick Comments (Horizontal Scroll) -->
+                    <div class="mb-6">
+                        <div class="flex items-center gap-2 mb-3">
+                            <i class="fas fa-comment-dots text-accent"></i>
+                            <p class="text-sm text-gray-700">Pilih komentar cepat:</p>
+                        </div>
+                        
+                        <div class="scroll-container flex gap-2 overflow-x-auto pb-2">
+                            <!-- Delivery Templates -->
+                            <button class="quick-comment-btn px-3 py-2 bg-purple-50 text-gray-700 rounded-lg whitespace-nowrap" 
+                                    data-text="Pesanan tepat waktu">
+                                <i class="fas fa-clock text-purple-600 mr-1"></i>
+                                Tepat Waktu
                             </button>
-                            <button class="filter-btn px-4 py-2 rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 text-sm md:text-base font-medium transition-all duration-300" data-filter="5">
-                                5 Bintang
+                            
+                            <button class="quick-comment-btn px-3 py-2 bg-purple-50 text-gray-700 rounded-lg whitespace-nowrap"
+                                    data-text="Pengiriman cepat dan aman">
+                                <i class="fas fa-bolt text-purple-600 mr-1"></i>
+                                Cepat & Aman
                             </button>
-                            <button class="filter-btn px-4 py-2 rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 text-sm md:text-base font-medium transition-all duration-300" data-filter="4">
-                                4 Bintang
+                            
+                            <!-- Food Quality Templates -->
+                            <button class="quick-comment-btn px-3 py-2 bg-blue-50 text-gray-700 rounded-lg whitespace-nowrap"
+                                    data-text="Makanan masih hangat dan enak">
+                                <i class="fas fa-utensils text-blue-600 mr-1"></i>
+                                Makanan Enak
                             </button>
-                            <button class="filter-btn px-4 py-2 rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 text-sm md:text-base font-medium transition-all duration-300" data-filter="3">
-                                3 Bintang
+                            
+                            <button class="quick-comment-btn px-3 py-2 bg-blue-50 text-gray-700 rounded-lg whitespace-nowrap"
+                                    data-text="Pesanan lengkap dan sesuai">
+                                <i class="fas fa-check-circle text-blue-600 mr-1"></i>
+                                Lengkap & Sesuai
                             </button>
-                            <button class="filter-btn px-4 py-2 rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 text-sm md:text-base font-medium transition-all duration-300" data-filter="1-2">
-                                1-2 Bintang
+                            
+                            <!-- Service Templates -->
+                            <button class="quick-comment-btn px-3 py-2 bg-green-50 text-gray-700 rounded-lg whitespace-nowrap"
+                                    data-text="Kurir ramah dan profesional">
+                                <i class="fas fa-user-check text-green-600 mr-1"></i>
+                                Kurir Ramah
+                            </button>
+                            
+                            <button class="quick-comment-btn px-3 py-2 bg-green-50 text-gray-700 rounded-lg whitespace-nowrap"
+                                    data-text="Pengemasan rapi">
+                                <i class="fas fa-box text-green-600 mr-1"></i>
+                                Kemasan Rapi
+                            </button>
+                            
+                            <!-- Experience Templates -->
+                            <button class="quick-comment-btn px-3 py-2 bg-pink-50 text-gray-700 rounded-lg whitespace-nowrap"
+                                    data-text="Pengalaman memuaskan, akan order lagi">
+                                <i class="fas fa-heart text-pink-600 mr-1"></i>
+                                Memuaskan
+                            </button>
+                            
+                            <button class="quick-comment-btn px-3 py-2 bg-pink-50 text-gray-700 rounded-lg whitespace-nowrap"
+                                    data-text="Sangat direkomendasikan">
+                                <i class="fas fa-star text-pink-600 mr-1"></i>
+                                Direkomendasikan
+                            </button>
+                            
+                            <!-- More Positive Templates -->
+                            <button class="quick-comment-btn px-3 py-2 bg-yellow-50 text-gray-700 rounded-lg whitespace-nowrap"
+                                    data-text="Harga worth it dengan kualitas">
+                                <i class="fas fa-tag text-yellow-600 mr-1"></i>
+                                Worth It
+                            </button>
+                            
+                            <button class="quick-comment-btn px-3 py-2 bg-indigo-50 text-gray-700 rounded-lg whitespace-nowrap"
+                                    data-text="Proses order mudah dan cepat">
+                                <i class="fas fa-mobile-alt text-indigo-600 mr-1"></i>
+                                Order Mudah
                             </button>
                         </div>
                     </div>
 
-                    <!-- Loading -->
-                    <div id="loading" class="flex flex-col items-center justify-center py-12 md:py-16">
-                        <div class="w-16 h-16 md:w-20 md:h-20 border-4 border-orange-200 border-t-primary rounded-full animate-spin mb-4 md:mb-6"></div>
-                        <p class="text-gray-600 text-lg md:text-xl">Memuat data review...</p>
+                    <!-- Comment Input -->
+                    <div class="mb-6">
+                        <label class="block text-sm text-gray-700 mb-2">
+                            <i class="fas fa-edit text-accent mr-1"></i>
+                            Komentar Anda (opsional)
+                        </label>
+                        <textarea id="reviewComment" rows="2"
+                            class="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none resize-none"
+                            placeholder="Tambahkan komentar pribadi..."
+                            maxlength="150"></textarea>
+                        <div class="flex justify-between mt-1">
+                            <p class="text-xs text-gray-500">Max 150 karakter</p>
+                            <p id="charCount" class="text-xs text-gray-500">0/150</p>
+                        </div>
                     </div>
 
-                    <!-- Reviews Grid -->
-                    <div id="reviewsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6 custom-scrollbar max-h-[600px] overflow-y-auto pr-2"></div>
+                    <!-- Submit Button -->
+                    <button id="submitRatingBtn" class="btn-primary w-full text-white py-3 rounded-lg font-medium">
+                        <i class="fas fa-paper-plane mr-2"></i>Kirim Rating
+                    </button>
+                </div>
+            </div>
 
-                    <!-- Empty State -->
-                    <div id="emptyState" class="hidden text-center py-12 md:py-16">
-                        <div class="w-24 h-24 md:w-32 md:h-32 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <i class="fas fa-comment-slash text-gray-400 text-4xl md:text-5xl"></i>
-                        </div>
-                        <h3 class="text-xl md:text-2xl font-bold text-gray-700 mb-3">Belum Ada Review</h3>
-                        <p class="text-gray-600 max-w-md mx-auto">Belum ada review yang diberikan oleh pelanggan.</p>
+            <!-- Success Modal -->
+            <div id="successModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                <div class="bg-white rounded-xl p-6 max-w-sm w-full text-center animate-slide-up">
+                    <div class="w-16 h-16 rounded-full bg-gradient-to-br from-success to-green-400 flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-check text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Terima Kasih!</h3>
+                    <p class="text-gray-600 text-sm mb-4">Rating Anda telah dikirim.</p>
+                    <div class="flex gap-2">
+                        <button id="closeModal" class="flex-1 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm">
+                            Tutup
+                        </button>
+                        <button id="shareRating" class="flex-1 py-2 btn-primary text-white rounded-lg text-sm">
+                            <i class="fas fa-share mr-1"></i>Bagikan
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Sidebar -->
-            <div class="space-y-6 md:space-y-8">
-                <!-- Rating Distribution -->
-                <div class="bg-white rounded-2xl md:rounded-3xl shadow-soft p-5 md:p-6">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="bg-primary/10 p-2 rounded-lg">
-                            <i class="fas fa-chart-pie text-primary"></i>
-                        </div>
-                        <h3 class="text-lg md:text-xl font-bold text-gray-800">Distribusi Rating</h3>
+            <!-- Stats Section -->
+            <div class="bg-white rounded-xl p-5 shadow-sm animate-slide-up">
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-chart-bar text-primary"></i>
+                    <h3 class="font-bold text-gray-800">Statistik Rating</h3>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <div class="text-center p-3 bg-purple-50 rounded-lg">
+                        <p class="text-2xl font-bold text-primary mb-1" id="totalRatings">0</p>
+                        <p class="text-gray-600 text-xs">Total Rating</p>
                     </div>
-                    <div id="ratingDistribution" class="space-y-4 md:space-y-5"></div>
+                    <div class="text-center p-3 bg-green-50 rounded-lg">
+                        <p class="text-2xl font-bold text-success mb-1" id="avgRating">0.0</p>
+                        <p class="text-gray-600 text-xs">Rata-rata</p>
+                    </div>
                 </div>
 
-                <!-- Recent Activity -->
-                <div class="bg-white rounded-2xl md:rounded-3xl shadow-soft p-5 md:p-6">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="bg-primary/10 p-2 rounded-lg">
-                            <i class="fas fa-bolt text-primary"></i>
-                        </div>
-                        <h3 class="text-lg md:text-xl font-bold text-gray-800">Aktivitas Terbaru</h3>
+                <!-- Recent Reviews -->
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <p class="text-sm text-gray-700">Rating Terbaru</p>
+                        <button id="refreshBtn" class="text-primary text-sm">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
                     </div>
-                    <div id="recentActivity" class="space-y-4 max-h-[300px] overflow-y-auto custom-scrollbar pr-2"></div>
-                </div>
-
-                <!-- Info Panel -->
-                <div class="bg-gradient-orange-light border border-primary/20 rounded-2xl md:rounded-3xl p-5 md:p-6">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="bg-primary/20 p-2 rounded-lg">
-                            <i class="fas fa-info-circle text-primary"></i>
-                        </div>
-                        <h3 class="text-lg md:text-xl font-bold text-gray-800">Informasi</h3>
+                    
+                    <div id="reviewsContainer" class="space-y-3"></div>
+                    
+                    <div id="emptyReviews" class="hidden text-center py-4">
+                        <i class="fas fa-comment text-gray-300 text-xl mb-2"></i>
+                        <p class="text-gray-500 text-sm">Belum ada rating</p>
                     </div>
-                    <p class="text-gray-700 text-sm md:text-base">
-                        Nama pelanggan telah disensor untuk menjaga privasi. 
-                        Data diupdate secara real-time dari database.
-                    </p>
                 </div>
             </div>
-        </div>
+
+            <!-- Subscription Section -->
+            <div class="bg-gradient-to-r from-primary to-secondary rounded-xl p-5 text-white animate-slide-up">
+                <div class="flex items-start gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="font-bold mb-1">Dapatkan Notifikasi</h3>
+                        <p class="text-white/90 text-sm mb-3">Info promo dan update layanan</p>
+                        <button id="subscribeBtn" class="bg-white text-primary px-4 py-2 rounded-lg text-sm font-medium">
+                            <i class="fas fa-bell mr-1"></i>Aktifkan
+                        </button>
+                        <p id="subscribeStatus" class="text-white/80 text-xs mt-2 hidden"></p>
+                    </div>
+                </div>
+            </div>
+        </main>
 
         <!-- Footer -->
-        <footer class="mt-8 md:mt-12 pt-6 md:pt-8 border-t border-orange-200 text-center">
-            <p class="text-gray-600 mb-2">&copy; 2023 VLCrave Delivery. Dashboard Review v1.0</p>
-            <a href="review-tailwind.html" 
-               class="inline-flex items-center gap-2 bg-gradient-orange text-white px-5 py-2.5 md:px-6 md:py-3 rounded-xl font-semibold hover:shadow-orange-glow hover:transform hover:-translate-y-0.5 transition-all duration-300">
-                <i class="fas fa-arrow-left"></i>
-                <span>Kembali ke Halaman Review</span>
-            </a>
+        <footer class="mt-8 text-center text-gray-500 text-sm">
+            <p>© 2024 VLCrave Delivery • 1 invoice = 1 rating</p>
         </footer>
     </div>
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-    
     <script>
-        // Konfigurasi Firebase
+        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyA1kevuJ9mRJ8le8uPXin11uUqJ6sOLopY",
             authDomain: "vlcrave-whatsapp-order.firebaseapp.com",
@@ -324,312 +377,434 @@
             measurementId: "G-XLWNDN39ZD"
         };
 
-        // Inisialisasi Firebase
+        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Variabel global
+        // Get invoice from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const invoiceFromUrl = urlParams.get('id');
+        const invoiceNumber = invoiceFromUrl ? invoiceFromUrl.trim().toUpperCase() : null;
+
+        // State variables
+        let currentInvoice = null;
+        let selectedRating = 0;
+        let selectedQuickComment = null;
         let allReviews = [];
-        let currentFilter = 'all';
 
-        // Fungsi untuk memformat tanggal
-        function formatDate(timestamp) {
-            if (!timestamp) return 'Tanggal tidak tersedia';
-            
-            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-            const options = { 
-                day: 'numeric', 
-                month: 'long', 
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            };
-            return date.toLocaleDateString('id-ID', options);
+        // Format currency
+        function formatRupiah(amount) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0
+            }).format(amount);
         }
 
-        // Fungsi untuk membuat bintang rating
-        function createStars(rating) {
-            let starsHtml = '';
-            for (let i = 1; i <= 5; i++) {
-                if (i <= rating) {
-                    starsHtml += '<i class="fas fa-star text-yellow-400"></i>';
-                } else {
-                    starsHtml += '<i class="far fa-star text-gray-300"></i>';
-                }
+        // Format date
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            return dateString;
+        }
+
+        // Load invoice from URL
+        async function loadInvoiceFromUrl() {
+            if (!invoiceNumber) {
+                showError('URL tidak valid. Format: ?id=VLC-XXXX');
+                return;
             }
-            return starsHtml;
-        }
 
-        // Fungsi untuk mendapatkan inisial nama
-        function getInitials(name) {
-            if (!name) return '?';
-            const parts = name.split(' ');
-            if (parts.length >= 2) {
-                return (parts[0][0] + parts[1][0]).toUpperCase();
+            // Validate format
+            if (!/^VLC-\d{4}$/.test(invoiceNumber)) {
+                showError('Format invoice salah. Gunakan format: VLC-XXXX');
+                return;
             }
-            return name.substring(0, 2).toUpperCase();
-        }
 
-        // Fungsi untuk memuat semua review
-        async function loadReviews() {
             try {
-                const querySnapshot = await db.collection('reviews')
+                // Check in invoices collection
+                const invoiceQuery = await db.collection('invoices')
+                    .where('invoiceNumber', '==', invoiceNumber)
+                    .get();
+
+                if (invoiceQuery.empty) {
+                    showInvoiceNotFound();
+                    return;
+                }
+
+                // Get invoice data
+                invoiceQuery.forEach(doc => {
+                    currentInvoice = { id: doc.id, ...doc.data() };
+                });
+
+                // Check if already reviewed
+                const reviewQuery = await db.collection('public_ratings')
+                    .where('invoiceNumber', '==', invoiceNumber)
+                    .get();
+
+                if (!reviewQuery.empty) {
+                    showAlreadyRated();
+                } else {
+                    showInvoiceDetails();
+                }
+
+                // Load reviews data
+                loadReviewsData();
+
+            } catch (error) {
+                console.error('Error loading invoice:', error);
+                showError('Terjadi kesalahan saat memuat data');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Show invoice details
+        function showInvoiceDetails() {
+            if (!currentInvoice) return;
+            
+            // Update invoice info
+            document.getElementById('invoiceNumber').textContent = currentInvoice.invoiceNumber;
+            document.getElementById('invoiceDate').textContent = formatDate(currentInvoice.date);
+            document.getElementById('invoiceStatus').textContent = currentInvoice.status === 'completed' ? 'Selesai' : currentInvoice.status;
+            document.getElementById('invoiceTotal').textContent = formatRupiah(currentInvoice.total);
+            
+            // Update items count
+            const itemCount = currentInvoice.products ? currentInvoice.products.length : 0;
+            document.getElementById('invoiceItems').textContent = itemCount;
+            
+            // Show products
+            const productsList = document.getElementById('productsList');
+            productsList.innerHTML = '';
+            
+            if (currentInvoice.products && currentInvoice.products.length > 0) {
+                currentInvoice.products.forEach((product, index) => {
+                    const productEl = document.createElement('div');
+                    productEl.className = 'flex justify-between items-center py-2 border-b border-gray-100 last:border-0';
+                    productEl.innerHTML = `
+                        <div class="flex-1">
+                            <p class="font-medium text-gray-800">${product.name}</p>
+                            <p class="text-sm text-gray-600">${product.quantity} × ${formatRupiah(product.price)}</p>
+                        </div>
+                        <p class="font-bold text-gray-800 ml-4">${formatRupiah(product.total)}</p>
+                    `;
+                    productsList.appendChild(productEl);
+                });
+            }
+            
+            document.getElementById('invoiceDetails').classList.remove('hidden');
+        }
+
+        // Show invoice not found
+        function showInvoiceNotFound() {
+            document.getElementById('invoiceNotFoundNumber').textContent = invoiceNumber;
+            document.getElementById('invoiceNotFound').classList.remove('hidden');
+        }
+
+        // Show already rated
+        function showAlreadyRated() {
+            document.getElementById('alreadyRated').classList.remove('hidden');
+        }
+
+        // Show error
+        function showError(message) {
+            document.getElementById('loading').innerHTML = `
+                <div class="text-center py-8">
+                    <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-exclamation-triangle text-red-500"></i>
+                    </div>
+                    <p class="text-gray-800 mb-2">${message}</p>
+                    <p class="text-gray-600 text-sm">Contoh URL yang benar:</p>
+                    <p class="text-primary font-mono text-sm mt-1">...com/?id=VLC-0015</p>
+                </div>
+            `;
+        }
+
+        // Hide loading
+        function hideLoading() {
+            document.getElementById('loading').classList.add('hidden');
+        }
+
+        // Handle quick comment selection
+        function handleQuickComment(button, commentText) {
+            // Remove selection from all buttons
+            document.querySelectorAll('.quick-comment-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            // Add selection to clicked button
+            button.classList.add('selected');
+            selectedQuickComment = commentText;
+            
+            // Set comment textarea
+            const textarea = document.getElementById('reviewComment');
+            textarea.value = commentText;
+            document.getElementById('charCount').textContent = `${commentText.length}/150`;
+        }
+
+        // Submit rating
+        async function submitRating() {
+            if (selectedRating === 0) {
+                showToast('Pilih rating terlebih dahulu', 'error');
+                return;
+            }
+
+            if (!currentInvoice) {
+                showToast('Invoice tidak valid', 'error');
+                return;
+            }
+
+            const comment = document.getElementById('reviewComment').value.trim();
+            const btn = document.getElementById('submitRatingBtn');
+            
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Mengirim...';
+
+            try {
+                // Save rating
+                const ratingData = {
+                    invoiceNumber: currentInvoice.invoiceNumber,
+                    rating: selectedRating,
+                    comment: comment || null,
+                    isQuickComment: selectedQuickComment === comment,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    invoiceData: {
+                        total: currentInvoice.total,
+                        date: currentInvoice.date,
+                        products: currentInvoice.products
+                    }
+                };
+
+                await db.collection('public_ratings').add(ratingData);
+                
+                // Show success modal
+                document.getElementById('successModal').classList.remove('hidden');
+                
+                // Update reviews
+                loadReviewsData();
+
+            } catch (error) {
+                console.error('Error submitting rating:', error);
+                showToast('Gagal mengirim rating', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+
+        // Load reviews data
+        async function loadReviewsData() {
+            try {
+                const snapshot = await db.collection('public_ratings')
                     .orderBy('createdAt', 'desc')
+                    .limit(5)
                     .get();
                 
                 allReviews = [];
-                querySnapshot.forEach(doc => {
+                snapshot.forEach(doc => {
+                    const data = doc.data();
                     allReviews.push({
                         id: doc.id,
-                        ...doc.data()
+                        ...data,
+                        createdAt: data.createdAt?.toDate?.() || new Date()
                     });
                 });
                 
-                updateStatistics();
+                updateStats();
                 displayReviews();
-                updateRatingDistribution();
-                updateRecentActivity();
-                
-                document.getElementById('loading').classList.add('hidden');
-                
-                if (allReviews.length === 0) {
-                    document.getElementById('emptyState').classList.remove('hidden');
-                } else {
-                    document.getElementById('emptyState').classList.add('hidden');
-                }
                 
             } catch (error) {
                 console.error('Error loading reviews:', error);
-                document.getElementById('loading').innerHTML = `
-                    <div class="text-center py-12">
-                        <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <i class="fas fa-exclamation-triangle text-red-500 text-3xl"></i>
-                        </div>
-                        <h3 class="text-xl font-bold text-gray-700 mb-3">Terjadi Kesalahan</h3>
-                        <p class="text-gray-600">Gagal memuat data review. Silakan refresh halaman.</p>
-                    </div>
-                `;
             }
         }
 
-        // Fungsi untuk memperbarui statistik
-        function updateStatistics() {
-            const totalReviews = allReviews.length;
-            document.getElementById('totalReviews').textContent = totalReviews.toLocaleString();
-            
-            if (totalReviews > 0) {
-                const totalRating = allReviews.reduce((sum, review) => sum + review.rating, 0);
-                const avgRating = (totalRating / totalReviews).toFixed(1);
-                document.getElementById('avgRating').textContent = avgRating;
-                
-                // Hitung persentase review positif (4-5 bintang)
-                const positiveReviews = allReviews.filter(review => review.rating >= 4).length;
-                const positivePercentage = Math.round((positiveReviews / totalReviews) * 100);
-                document.getElementById('positiveReviews').textContent = `${positivePercentage}%`;
-                
-                // Hitung review bulan ini
-                const now = new Date();
-                const currentMonth = now.getMonth();
-                const currentYear = now.getFullYear();
-                
-                const recentReviews = allReviews.filter(review => {
-                    const reviewDate = review.createdAt?.toDate ? review.createdAt.toDate() : new Date(review.createdAt);
-                    return reviewDate.getMonth() === currentMonth && 
-                           reviewDate.getFullYear() === currentYear;
-                }).length;
-                
-                document.getElementById('recentReviews').textContent = recentReviews;
-            } else {
+        // Update statistics
+        function updateStats() {
+            if (allReviews.length === 0) {
+                document.getElementById('totalRatings').textContent = '0';
                 document.getElementById('avgRating').textContent = '0.0';
-                document.getElementById('positiveReviews').textContent = '0%';
-                document.getElementById('recentReviews').textContent = '0';
-            }
-        }
-
-        // Fungsi untuk menampilkan review
-        function displayReviews() {
-            const reviewsGrid = document.getElementById('reviewsGrid');
-            reviewsGrid.innerHTML = '';
-            
-            let filteredReviews = allReviews;
-            
-            if (currentFilter === '5') {
-                filteredReviews = allReviews.filter(review => review.rating === 5);
-            } else if (currentFilter === '4') {
-                filteredReviews = allReviews.filter(review => review.rating === 4);
-            } else if (currentFilter === '3') {
-                filteredReviews = allReviews.filter(review => review.rating === 3);
-            } else if (currentFilter === '1-2') {
-                filteredReviews = allReviews.filter(review => review.rating <= 2);
-            }
-            
-            filteredReviews.forEach(review => {
-                const reviewCard = document.createElement('div');
-                reviewCard.className = 'review-card bg-white border border-gray-100 rounded-xl md:rounded-2xl p-5 shadow-soft hover:shadow-medium transition-all duration-300 animate-fade-in';
-                reviewCard.innerHTML = `
-                    <div class="relative">
-                        <!-- Top border -->
-                        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-secondary rounded-t-xl"></div>
-                        
-                        <!-- Header -->
-                        <div class="flex items-center gap-4 mb-4 pt-2">
-                            <div class="bg-gradient-orange w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold">
-                                ${getInitials(review.censoredName || review.userName)}
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-gray-800">${review.censoredName || 'Pelanggan'}</h4>
-                                <p class="text-gray-600 text-sm">${formatDate(review.createdAt)}</p>
-                            </div>
-                        </div>
-                        
-                        <!-- Rating -->
-                        <div class="flex items-center gap-2 mb-4">
-                            <div class="flex">
-                                ${createStars(review.rating)}
-                            </div>
-                            <span class="font-bold text-gray-700">${review.rating}/5</span>
-                        </div>
-                        
-                        <!-- Review Text -->
-                        ${review.review ? `
-                            <div class="mb-4">
-                                <p class="text-gray-700 italic text-sm md:text-base">"${review.review}"</p>
-                            </div>
-                        ` : ''}
-                        
-                        <!-- Footer -->
-                        <div class="flex justify-between items-center pt-4 border-t border-gray-100">
-                            <div class="bg-gray-100 px-3 py-1 rounded-lg text-sm text-gray-700 font-medium">
-                                <i class="fas fa-receipt mr-2"></i>
-                                ${review.invoiceNumber}
-                            </div>
-                            <div class="text-gray-600 text-sm">
-                                <i class="fas fa-phone mr-1"></i>
-                                ${review.userPhone || '-'}
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                reviewsGrid.appendChild(reviewCard);
-            });
-        }
-
-        // Fungsi untuk memperbarui distribusi rating
-        function updateRatingDistribution() {
-            const distribution = {5: 0, 4: 0, 3: 0, 2: 0, 1: 0};
-            
-            allReviews.forEach(review => {
-                distribution[review.rating]++;
-            });
-            
-            const totalReviews = allReviews.length;
-            const distributionContainer = document.getElementById('ratingDistribution');
-            distributionContainer.innerHTML = '';
-            
-            [5, 4, 3, 2, 1].forEach(rating => {
-                const count = distribution[rating];
-                const percentage = totalReviews > 0 ? Math.round((count / totalReviews) * 100) : 0;
-                
-                const ratingBar = document.createElement('div');
-                ratingBar.className = 'space-y-2';
-                ratingBar.innerHTML = `
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <span class="text-gray-700 font-medium">${rating} ★</span>
-                        </div>
-                        <span class="text-gray-600 font-medium">${percentage}%</span>
-                    </div>
-                    <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div class="bar-fill h-full rounded-full bg-gradient-to-r from-primary to-secondary" style="width: ${percentage}%"></div>
-                    </div>
-                `;
-                
-                distributionContainer.appendChild(ratingBar);
-            });
-        }
-
-        // Fungsi untuk memperbarui aktivitas terbaru
-        function updateRecentActivity() {
-            const recentActivity = document.getElementById('recentActivity');
-            recentActivity.innerHTML = '';
-            
-            // Ambil 5 review terbaru
-            const recentReviews = allReviews.slice(0, 5);
-            
-            if (recentReviews.length === 0) {
-                recentActivity.innerHTML = `
-                    <div class="text-center py-8">
-                        <i class="fas fa-clock text-gray-400 text-3xl mb-3"></i>
-                        <p class="text-gray-600">Belum ada aktivitas</p>
-                    </div>
-                `;
                 return;
             }
             
-            recentReviews.forEach(review => {
-                const activityItem = document.createElement('div');
-                activityItem.className = 'activity-item bg-gray-50 rounded-xl p-4 hover:bg-orange-50 transition-all duration-300';
+            document.getElementById('totalRatings').textContent = allReviews.length;
+            
+            // Calculate average rating
+            const totalRating = allReviews.reduce((sum, review) => sum + review.rating, 0);
+            const avgRating = (totalRating / allReviews.length).toFixed(1);
+            document.getElementById('avgRating').textContent = avgRating;
+        }
+
+        // Display reviews
+        function displayReviews() {
+            const container = document.getElementById('reviewsContainer');
+            
+            if (allReviews.length === 0) {
+                document.getElementById('emptyReviews').classList.remove('hidden');
+                container.innerHTML = '';
+                return;
+            }
+            
+            document.getElementById('emptyReviews').classList.add('hidden');
+            container.innerHTML = '';
+            
+            allReviews.forEach(review => {
+                const date = new Date(review.createdAt);
+                const timeAgo = getTimeAgo(date);
                 
-                const ratingTexts = {
-                    5: "memberikan rating 5 bintang",
-                    4: "memberikan rating 4 bintang", 
-                    3: "memberikan rating 3 bintang",
-                    2: "memberikan rating 2 bintang",
-                    1: "memberikan rating 1 bintang"
-                };
+                const reviewEl = document.createElement('div');
+                reviewEl.className = 'bg-gray-50 p-3 rounded-lg animate-slide-left';
                 
-                const ratingColors = {
-                    5: "text-green-500",
-                    4: "text-green-400",
-                    3: "text-yellow-500",
-                    2: "text-orange-500",
-                    1: "text-red-500"
-                };
-                
-                activityItem.innerHTML = `
-                    <div class="flex items-center gap-4">
-                        <div class="bg-white w-10 h-10 rounded-lg flex items-center justify-center shadow-sm">
-                            <i class="fas fa-star ${ratingColors[review.rating]}"></i>
+                reviewEl.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+                                <i class="fas fa-user text-primary text-xs"></i>
+                            </div>
+                            <span class="text-sm font-medium text-gray-800">${review.invoiceNumber}</span>
                         </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="font-medium text-gray-800 truncate">${review.censoredName || 'Pelanggan'}</p>
-                            <p class="text-gray-600 text-sm">${ratingTexts[review.rating] || 'memberikan review'}</p>
-                        </div>
+                        <span class="text-xs text-gray-500">${timeAgo}</span>
                     </div>
+                    
+                    <div class="flex items-center gap-1 mb-2">
+                        ${Array(review.rating).fill().map(() => '<i class="fas fa-star text-yellow-500 text-xs"></i>').join('')}
+                        ${Array(5 - review.rating).fill().map(() => '<i class="far fa-star text-gray-300 text-xs"></i>').join('')}
+                    </div>
+                    
+                    ${review.comment ? `
+                        <p class="text-sm text-gray-700">"${review.comment}"</p>
+                    ` : ''}
                 `;
                 
-                recentActivity.appendChild(activityItem);
+                container.appendChild(reviewEl);
             });
         }
 
-        // Setup event listeners setelah DOM dimuat
-        document.addEventListener('DOMContentLoaded', function() {
-            // Setup filter buttons
-            document.querySelectorAll('.filter-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    // Update active state
-                    document.querySelectorAll('.filter-btn').forEach(btn => {
-                        btn.classList.remove('active', 'bg-primary', 'text-white');
-                        btn.classList.add('bg-gray-100', 'text-gray-700');
+        // Get time ago
+        function getTimeAgo(date) {
+            const seconds = Math.floor((new Date() - date) / 1000);
+            
+            if (seconds < 60) return 'baru saja';
+            if (seconds < 3600) return `${Math.floor(seconds / 60)}m lalu`;
+            if (seconds < 86400) return `${Math.floor(seconds / 3600)}j lalu`;
+            if (seconds < 604800) return `${Math.floor(seconds / 86400)}h lalu`;
+            return date.toLocaleDateString('id-ID');
+        }
+
+        // Show toast
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = `fixed top-4 right-4 z-50 px-4 py-2 rounded-lg text-white text-sm font-medium animate-slide-up ${
+                type === 'error' ? 'bg-red-500' : 'bg-primary'
+            }`;
+            toast.textContent = message;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load invoice from URL
+            if (invoiceNumber) {
+                loadInvoiceFromUrl();
+            } else {
+                showError('Tambahkan parameter ?id=VLC-XXXX di URL');
+            }
+
+            // Rating stars
+            document.querySelectorAll('.star').forEach(star => {
+                star.addEventListener('click', function() {
+                    selectedRating = parseInt(this.dataset.value);
+                    
+                    const ratingTexts = ['Buruk', 'Cukup', 'Baik', 'Sangat Baik', 'Luar Biasa'];
+                    
+                    document.querySelectorAll('.star').forEach(s => {
+                        const value = parseInt(s.dataset.value);
+                        if (value <= selectedRating) {
+                            s.classList.add('selected');
+                            s.style.color = '#fbbf24';
+                        } else {
+                            s.classList.remove('selected');
+                            s.style.color = '#e5e7eb';
+                        }
                     });
                     
-                    this.classList.remove('bg-gray-100', 'text-gray-700');
-                    this.classList.add('active', 'bg-primary', 'text-white');
-                    
-                    // Update filter and display
-                    currentFilter = this.getAttribute('data-filter');
-                    displayReviews();
+                    document.getElementById('ratingText').textContent = `${selectedRating}/5 - ${ratingTexts[selectedRating-1]}`;
                 });
             });
-            
-            // Muat data review
-            loadReviews();
-            
-            // Real-time updates
-            db.collection('reviews').onSnapshot(() => {
-                loadReviews();
+
+            // Quick comment buttons
+            document.querySelectorAll('.quick-comment-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const commentText = this.getAttribute('data-text');
+                    handleQuickComment(this, commentText);
+                });
             });
+
+            // Character count
+            document.getElementById('reviewComment').addEventListener('input', function() {
+                document.getElementById('charCount').textContent = `${this.value.length}/150`;
+                
+                // Deselect quick comment if user types custom text
+                if (selectedQuickComment !== this.value) {
+                    selectedQuickComment = null;
+                    document.querySelectorAll('.quick-comment-btn').forEach(btn => {
+                        btn.classList.remove('selected');
+                    });
+                }
+            });
+
+            // Submit rating
+            document.getElementById('submitRatingBtn').addEventListener('click', submitRating);
+
+            // Refresh button
+            document.getElementById('refreshBtn').addEventListener('click', function() {
+                this.classList.add('animate-spin');
+                loadReviewsData();
+                setTimeout(() => {
+                    this.classList.remove('animate-spin');
+                }, 1000);
+            });
+
+            // Modal buttons
+            document.getElementById('closeModal').addEventListener('click', function() {
+                document.getElementById('successModal').classList.add('hidden');
+            });
+
+            document.getElementById('shareRating').addEventListener('click', function() {
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'Rating VLCrave Delivery',
+                        text: `Saya baru saja memberikan rating ${selectedRating} bintang untuk VLCrave Delivery!`,
+                        url: window.location.href
+                    });
+                } else {
+                    navigator.clipboard.writeText(window.location.href);
+                    showToast('Link disalin!', 'success');
+                }
+            });
+
+            // Subscribe button
+            document.getElementById('subscribeBtn').addEventListener('click', async function() {
+                if (!('Notification' in window)) {
+                    showToast('Browser tidak mendukung notifikasi', 'error');
+                    return;
+                }
+                
+                const permission = await Notification.requestPermission();
+                
+                if (permission === 'granted') {
+                    this.innerHTML = '<i class="fas fa-bell-slash mr-1"></i>Aktif';
+                    this.classList.add('bg-green-500', 'text-white');
+                    showToast('Notifikasi diaktifkan!', 'success');
+                }
+            });
+
+            // Real-time updates
+            db.collection('public_ratings').onSnapshot(loadReviewsData);
         });
     </script>
 </body>
